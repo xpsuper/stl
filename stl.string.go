@@ -19,6 +19,76 @@ type XPStringImpl struct {
 
 }
 
+func (instance *XPStringImpl) ToString(data interface{}) (ok bool, result string) {
+	ok = true
+	switch data.(type) {
+	case string:
+		result = data.(string)
+		break
+	case int:
+		result = strconv.Itoa(data.(int))
+		break
+	case int8:
+		result = strconv.Itoa(int(data.(int8)))
+		break
+	case int16:
+		result = strconv.Itoa(int(data.(int16)))
+		break
+	case int32:
+		result = strconv.Itoa(int(data.(int32)))
+		break
+	case int64:
+		result = strconv.Itoa(int(data.(int64)))
+		break
+	case uint8:
+		result = strconv.FormatUint(uint64(data.(uint8)), 10)
+		break
+	case uint16:
+		result = strconv.FormatUint(uint64(data.(uint16)), 10)
+		break
+	case uint32:
+		result = strconv.FormatUint(uint64(data.(uint32)), 10)
+		break
+	case uint64:
+		result = strconv.FormatUint(data.(uint64), 10)
+		break
+	case float32:
+		result = strconv.FormatFloat(data.(float64), 'f', -1, 32)
+		break
+	case float64:
+		result = strconv.FormatFloat(data.(float64), 'f', -1, 64)
+		break
+	case []byte:
+		result = string(data.([]byte))
+	case bool:
+		if data.(bool) {
+			result = "true"
+		} else {
+			result = "false"
+		}
+		break
+	default:
+		ok = false
+		result = ""
+		break
+	}
+
+	return ok, result
+}
+
+func (instance *XPStringImpl) ToStringDef(data interface{}, defaultValue ...string) string {
+	ok, r := instance.ToString(data)
+	if ok {
+		return r
+	} else {
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
+		} else {
+			return ""
+		}
+	}
+}
+
 func (instance *XPStringImpl) SHA1(str string) string {
 	hashS := sha1.New()
 	hashS.Write([]byte(str))
