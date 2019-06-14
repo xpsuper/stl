@@ -1,6 +1,7 @@
 package stl
 
 import (
+	"math"
 	"math/rand"
 	"strconv"
 	"time"
@@ -29,6 +30,10 @@ func (instance *XPNumberImpl) Min(a, b int64) int64 {
 	} else {
 		return b
 	}
+}
+
+func (instance *XPNumberImpl) Round(x float64) (result int64) {
+	return int64(math.Floor(x + 0.5))
 }
 
 func (instance *XPNumberImpl) EqualsFloat32(a, b float32) bool {

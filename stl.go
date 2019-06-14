@@ -8,15 +8,18 @@ type IStl struct {
 	IPAddress  *XPIPImpl
 	Number     *XPNumberImpl
 	Queue      *XPQueueImpl
+	Regexp     *XPRegexpImpl
 	String     *XPStringImpl
 	Scheduler  *XPSchedulerImpl
 }
 
+//IpAddress
 func (instance *IStl) ConfigIpAddress(keyFileUrl, dataFileUrl string) {
 	KeyFileUrl  = keyFileUrl
 	DataFileUrl = dataFileUrl
 }
 
+//FilePath
 func (instance *IStl) FilePath(path string) (filepath *XPFilePathImpl, err error) {
 	return NewFilePath(path)
 }
@@ -25,14 +28,17 @@ func (instance *IStl) FilePathCurrent() (filepath *XPFilePathImpl, err error) {
 	return NewFilePathFromCurrentPath()
 }
 
+//IdGenerator
 func (instance *IStl) IdGenerator(workerId int64) (idGenerator *XPIdGeneratorImpl, err error) {
 	return NewIdGenerator(workerId)
 }
 
+//Http
 func (instance *IStl) Http() *XPHttpImpl {
 	return NewHttp()
 }
 
+//Json
 func (instance *IStl) JsonValid(json string) bool {
 	return Valid(json)
 }
@@ -53,6 +59,20 @@ func (instance *IStl) JsonGet(json, path string) JsonItem {
 	return Get(json, path)
 }
 
+//Promise
+func (instance *IStl) Promise(executor func(resolve func(interface{}), reject func(error))) *XPPromiseImpl {
+	return NewPromise(executor)
+}
+
+func (instance *IStl) Resolve(resolution interface{}) *XPPromiseImpl {
+	return ResolvePromise(resolution)
+}
+
+func (instance *IStl) Reject(err error) *XPPromiseImpl {
+	return RejectPromise(err)
+}
+
+//SpinLocker
 func (instance *IStl) SpinLocker() *SpinLock {
 	return &SpinLock{}
 }
@@ -68,6 +88,7 @@ func init()  {
 		IPAddress: NewIPAddress(),
 		Number:  &XPNumberImpl{},
 		Queue: NewXPQueue(500),
+		Regexp: &XPRegexpImpl{},
 		String: &XPStringImpl{},
 		Scheduler: NewScheduler(),
 	}

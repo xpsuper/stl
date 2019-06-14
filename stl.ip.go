@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -107,6 +108,11 @@ func (instance *XPIPImpl) InitData(filePath string) (rs interface{}) {
 	return instance.Data.InitIPData()
 }
 
+func (instance *XPIPImpl) Validate(ipAddress string) bool {
+	r := &XPRegexpImpl{}
+	return r.IsMatchString(`^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$`, ipAddress)
+}
+
 // 将ip地址转换为长整型
 func (instance *XPIPImpl) IP2Long(ipAddress string) int64 {
 	if ip := net.ParseIP(ipAddress); ip != nil {
@@ -127,6 +133,110 @@ func (instance *XPIPImpl) Long2IP(long int64) string {
 		ipBytes = append(ipBytes, byte(long>>((3-i)*8)))
 	}
 	return ipBytes.String()
+}
+
+func (instance *XPIPImpl) IP2Domain(ipAddress string) (string, error) {
+	domain, err := net.LookupAddr(ipAddress)
+	if domain != nil {
+		return strings.TrimRight(domain[0], "."), nil
+	}
+	return "", err
+}
+
+func (instance *XPIPImpl) Domain2IP(domain string) ([]string, error) {
+	ips, err := net.LookupIP(domain)
+	if ips != nil {
+		var items []string
+		for _, v := range ips {
+			if v.To4() != nil {
+				items = append(items, v.String())
+			}
+		}
+		return items, nil
+	}
+	return nil, err
+}
+
+// 判断所给ip是否为局域网ip
+// A类 10.0.0.0--10.255.255.255
+// B类 172.16.0.0--172.31.255.255
+// C类 192.168.0.0--192.168.255.255
+func (instance *XPIPImpl) IsIntranet(ipStr string) bool {
+	// ip协议保留的局域网ip
+	if strings.HasPrefix(ipStr, "10.") || strings.HasPrefix(ipStr, "192.168.") {
+		return true
+	}
+	if strings.HasPrefix(ipStr, "172.") {
+		// 172.16.0.0 - 172.31.255.255
+		arr := strings.Split(ipStr, ".")
+		if len(arr) != 4 {
+			return false
+		}
+
+		second, err := strconv.ParseInt(arr[1], 10, 64)
+		if err != nil {
+			return false
+		}
+
+		if second >= 16 && second <= 31 {
+			return true
+		}
+	}
+
+	return false
+}
+
+// 获取本地局域网ip列表
+func (instance *XPIPImpl) IntranetIP() (ips []string, err error) {
+	ips        = make([]string, 0)
+	inters, e := net.Interfaces()
+	if e != nil {
+		return ips, e
+	}
+	for _, inter := range inters {
+		if inter.Flags&net.FlagUp == 0 {
+			continue // interface down
+		}
+
+		if inter.Flags & net.FlagLoopback != 0 {
+			continue // loopback interface
+		}
+
+		// ignore warden bridge
+		if strings.HasPrefix(inter.Name, "w-") {
+			continue
+		}
+
+		addr, e := inter.Addrs()
+		if e != nil {
+			return ips, e
+		}
+
+		for _, addr := range addr {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+
+			if ip == nil || ip.IsLoopback() {
+				continue
+			}
+
+			ip = ip.To4()
+			if ip == nil {
+				continue // not an ipv4 address
+			}
+
+			ipStr := ip.String()
+			if instance.IsIntranet(ipStr) {
+				ips = append(ips, ipStr)
+			}
+		}
+	}
+	return ips, nil
 }
 
 // Find ip地址查询对应归属地信息
