@@ -1,6 +1,7 @@
 package stl
 
 type IStl struct {
+	Array      *XPArrayImpl
 	Async      *XPAsyncImpl
 	Config     *XPConfigImpl
 	DateTime   *XPDateTimeImpl
@@ -81,6 +82,7 @@ var IMP IStl
 
 func init()  {
 	IMP = IStl{
+		Array:  &XPArrayImpl{},
 		Async:  NewAsync(),
 		Config: NewXPConfig(nil),
 		DateTime: &XPDateTimeImpl{},

@@ -67,14 +67,38 @@ func (instance *XPNumberImpl) RandomInt(max int) int {
 	return r.Intn(max)
 }
 
+func (instance *XPNumberImpl) RandomIntRange(min, max int) int {
+	if min >= max || max == 0 {
+		return max
+	}
+
+	return rand.Intn(max-min) + min
+}
+
 func (instance *XPNumberImpl) RandomInt32(max int32) int32 {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	return r.Int31n(max)
 }
 
+func (instance *XPNumberImpl) RandomInt32Range(min, max int32) int32 {
+	if min >= max || max == 0 {
+		return max
+	}
+
+	return rand.Int31n(max-min) + min
+}
+
 func (instance *XPNumberImpl) RandomInt64(max int64) int64 {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	return r.Int63n(max)
+}
+
+func (instance *XPNumberImpl) RandomInt64Range(min, max int64) int64 {
+	if min >= max || max == 0 {
+		return max
+	}
+
+	return rand.Int63n(max-min) + min
 }
 
 func (instance *XPNumberImpl) ToInt64(data interface{}) (ok bool, result int64) {
