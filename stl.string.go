@@ -241,8 +241,27 @@ func (instance *XPStringImpl) Contain(str, sub string) bool {
 	return strings.Contains(str, sub)
 }
 
+func (instance *XPStringImpl) ContainHan(str string) bool {
+	result := false
+	for _, r := range str {
+		if unicode.Is(unicode.Scripts["Han"], r) {
+			result = true
+			break
+		}
+	}
+	return result
+}
+
 func (instance *XPStringImpl) IsEmpty(str string) bool {
 	return strings.Trim(str, " ") == ""
+}
+
+func (instance *XPStringImpl) IsNumeric(str string) bool {
+	pattern := "\\d+"
+	if r, err := getRegexp(pattern); err == nil {
+		return r.Match([]byte(str))
+	}
+	return false
 }
 
 func (instance *XPStringImpl) Random(length int) string {

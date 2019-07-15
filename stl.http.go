@@ -863,6 +863,15 @@ func changeMapToURLValues(data map[string]interface{}) url.Values {
 	return newUrlValues
 }
 
+func (h *XPHttpImpl) BuildUrlValues(data map[string]interface{}) url.Values {
+	return changeMapToURLValues(data)
+}
+
+func (h *XPHttpImpl) BuildUrlQuery(data map[string]interface{}) string {
+	v := changeMapToURLValues(data)
+	return v.Encode()
+}
+
 // End is the most important function that you need to call when ending the chain. The request won't proceed without calling it.
 // End function returns Response which matchs the structure of Response type in Golang's http package (but without Body data). The body data itself returns as a string in a 2nd return value.
 // Lastly but worth noticing, error array (NOTE: not just single error value) is returned as a 3rd value and nil otherwise.

@@ -122,3 +122,11 @@ func (instance *XPDateTimeImpl) StringToTimeFmt(str, fmt string) time.Time {
 func (instance *XPDateTimeImpl) TimeToStringFmt(t time.Time, fmt string) string {
 	return t.Format(convertFormat(fmt))
 }
+
+func (instance *XPDateTimeImpl) Timestamp() int64 {
+	return time.Now().Unix()
+}
+
+func (instance *XPDateTimeImpl) TimestampMillisecond() int64 {
+	return time.Now().UnixNano() / 1000000
+}
