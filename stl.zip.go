@@ -13,7 +13,7 @@ type XPZipImpl struct {
 
 }
 
-func (instance *XPStringImpl) IsZip(source string) bool {
+func (instance *XPZipImpl) IsZip(source string) bool {
 	f, err := os.Open(source)
 	if err != nil {
 		return false
@@ -28,7 +28,7 @@ func (instance *XPStringImpl) IsZip(source string) bool {
 	return bytes.Equal(buf, []byte("PK\x03\x04"))
 }
 
-func (instance *XPStringImpl) Zip(source, target string) error {
+func (instance *XPZipImpl) Zip(source, target string) error {
 	zipfile, err := os.Create(target)
 	if err != nil {
 		return err
@@ -89,7 +89,7 @@ func (instance *XPStringImpl) Zip(source, target string) error {
 	return err
 }
 
-func (instance *XPStringImpl) UnZip(archive, target string) error {
+func (instance *XPZipImpl) UnZip(archive, target string) error {
 	reader, err := zip.OpenReader(archive)
 	if err != nil {
 		return err
