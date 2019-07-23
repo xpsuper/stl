@@ -12,6 +12,7 @@ type IStl struct {
 	Regexp     *XPRegexpImpl
 	String     *XPStringImpl
 	Scheduler  *XPSchedulerImpl
+	Zip        *XPZipImpl
 }
 
 //IpAddress
@@ -60,6 +61,11 @@ func (instance *IStl) JsonGet(json, path string) JsonItem {
 	return Get(json, path)
 }
 
+//OrderMap
+func (instance *IStl) OrderMap(less OrderMapKeyLess) *OrderMap {
+	return NewOrderMap(less)
+}
+
 //Promise
 func (instance *IStl) Promise(executor func(resolve func(interface{}), reject func(error))) *XPPromiseImpl {
 	return NewPromise(executor)
@@ -93,5 +99,6 @@ func init()  {
 		Regexp: &XPRegexpImpl{},
 		String: &XPStringImpl{},
 		Scheduler: NewScheduler(),
+		Zip: &XPZipImpl{},
 	}
 }
