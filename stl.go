@@ -21,6 +21,11 @@ func (instance *IStl) ConfigIpAddress(keyFileUrl, dataFileUrl string) {
 	DataFileUrl = dataFileUrl
 }
 
+//Interface Deep Copy
+func (instance *IStl) DeepCopy(src interface{}) *XPDeepCPImpl {
+	return DeepCopy(src)
+}
+
 //FilePath
 func (instance *IStl) FilePath(path string) (filepath *XPFilePathImpl, err error) {
 	return NewFilePath(path)

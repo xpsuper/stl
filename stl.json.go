@@ -2397,7 +2397,7 @@ func IsPattern(str string) bool {
 }
 
 /*********** Json Pretty ***********/
-type Options struct {
+type JPOptions struct {
 	// Width is an max column width for single line arrays
 	// Default is 80
 	Width int
@@ -2412,11 +2412,11 @@ type Options struct {
 	SortKeys bool
 }
 
-var DefaultOptions = &Options{Width: 80, Prefix: "", Indent: "  ", SortKeys: false}
+var DefaultOptions = &JPOptions{Width: 80, Prefix: "", Indent: "  ", SortKeys: false}
 
 func Pretty(json []byte) []byte { return PrettyOptions(json, nil) }
 
-func PrettyOptions(json []byte, opts *Options) []byte {
+func PrettyOptions(json []byte, opts *JPOptions) []byte {
 	if opts == nil {
 		opts = DefaultOptions
 	}
