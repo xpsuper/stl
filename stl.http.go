@@ -894,7 +894,7 @@ func (h *XPHttpImpl) BuildUrlQuery(data map[string]interface{}) string {
 //    }
 //    gorequest.New().Get("http://www..google.com").End(printBody)
 //
-func (h *XPHttpImpl) End(callback ...func(response HTTPResponse, body string, errs []error)) (HTTPResponse, string, []error) {
+func (h *XPHttpImpl) End(callback ...func(response HTTPResponse, body string, errs []error)) (HTTPResponse, []*http.Cookie, string, []error) {
 	var bytesCallback []func(response HTTPResponse, body []byte, errs []error)
 	if len(callback) > 0 {
 		bytesCallback = []func(response HTTPResponse, body []byte, errs []error){
@@ -904,24 +904,25 @@ func (h *XPHttpImpl) End(callback ...func(response HTTPResponse, body string, er
 		}
 	}
 
-	resp, body, errs := h.EndBytes(bytesCallback...)
+	resp, cookies, body, errs := h.EndBytes(bytesCallback...)
 	bodyString := string(body)
 
-	return resp, bodyString, errs
+	return resp, cookies, bodyString, errs
 }
 
 // EndBytes should be used when you want the body as bytes. The callbacks work the same way as with `End`, except that a byte array is used instead of a string.
-func (h *XPHttpImpl) EndBytes(callback ...func(response HTTPResponse, body []byte, errs []error)) (HTTPResponse, []byte, []error) {
+func (h *XPHttpImpl) EndBytes(callback ...func(response HTTPResponse, body []byte, errs []error)) (HTTPResponse, []*http.Cookie, []byte, []error) {
 	var (
-		errs []error
-		resp HTTPResponse
-		body []byte
+		errs    []error
+		resp    HTTPResponse
+		body    []byte
+		cookies []*http.Cookie
 	)
 
 	for {
-		resp, body, errs = h.getResponseBytes()
+		resp, cookies, body, errs = h.getResponseBytes()
 		if errs != nil {
-			return nil, nil, errs
+			return nil, nil, nil, errs
 		}
 		if h.isRetryableRequest(resp) {
 			resp.Header.Set("Retry-Count", strconv.Itoa(h.Retryable.Attempt))
@@ -933,7 +934,7 @@ func (h *XPHttpImpl) EndBytes(callback ...func(response HTTPResponse, body []byt
 	if len(callback) != 0 {
 		callback[0](&respCallback, body, h.Errors)
 	}
-	return resp, body, nil
+	return resp, cookies, body, nil
 }
 
 func (h *XPHttpImpl) isRetryableRequest(resp HTTPResponse) bool {
@@ -955,32 +956,34 @@ func contains(respStatus int, statuses []int) bool {
 }
 
 // EndStruct should be used when you want the body as a struct. The callbacks work the same way as with `End`, except that a struct is used instead of a string.
-func (h *XPHttpImpl) EndStruct(v interface{}, callback ...func(response HTTPResponse, v interface{}, body []byte, errs []error)) (HTTPResponse, []byte, []error) {
-	resp, body, errs := h.EndBytes()
+func (h *XPHttpImpl) EndStruct(v interface{}, callback ...func(response HTTPResponse, v interface{}, body []byte, errs []error)) (HTTPResponse, []*http.Cookie, []byte, []error) {
+	resp, cookies, body, errs := h.EndBytes()
 	if errs != nil {
-		return nil, body, errs
+		return nil, nil, body, errs
 	}
 	err := json.Unmarshal(body, &v)
 	if err != nil {
 		h.Errors = append(h.Errors, err)
-		return resp, body, h.Errors
+		return resp, nil, body, h.Errors
 	}
 	respCallback := *resp
 	if len(callback) != 0 {
 		callback[0](&respCallback, v, body, h.Errors)
 	}
-	return resp, body, nil
+	return resp, cookies, body, nil
 }
 
-func (h *XPHttpImpl) getResponseBytes() (HTTPResponse, []byte, []error) {
+func (h *XPHttpImpl) getResponseBytes() (HTTPResponse, []*http.Cookie, []byte, []error) {
 	var (
-		req  *http.Request
-		err  error
-		resp HTTPResponse
+		req     *http.Request
+		oresp   *http.Response
+		resp    HTTPResponse
+		cookies []*http.Cookie
+		err     error
 	)
 	// check whether there is an error. if yes, return all errors
 	if len(h.Errors) != 0 {
-		return nil, nil, h.Errors
+		return nil, nil, nil, h.Errors
 	}
 	// check if there is forced type
 	switch h.ForceType {
@@ -1005,7 +1008,7 @@ func (h *XPHttpImpl) getResponseBytes() (HTTPResponse, []byte, []error) {
 	req, err = h.MakeRequest()
 	if err != nil {
 		h.Errors = append(h.Errors, err)
-		return nil, nil, h.Errors
+		return nil, nil, nil, h.Errors
 	}
 
 	// Set Transport
@@ -1039,8 +1042,10 @@ func (h *XPHttpImpl) getResponseBytes() (HTTPResponse, []byte, []error) {
 	resp, err = h.Client.Do(req)
 	if err != nil {
 		h.Errors = append(h.Errors, err)
-		return nil, nil, h.Errors
+		return nil, nil, nil, h.Errors
 	}
+	oresp   = resp
+	cookies = oresp.Cookies()
 	defer resp.Body.Close()
 
 	// Log details of this response
@@ -1057,7 +1062,7 @@ func (h *XPHttpImpl) getResponseBytes() (HTTPResponse, []byte, []error) {
 	// Reset resp.Body so it can be use again
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 
-	return resp, body, nil
+	return resp, cookies, body, nil
 }
 
 func (h *XPHttpImpl) MakeRequest() (*http.Request, error) {
