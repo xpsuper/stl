@@ -84,6 +84,14 @@ func (instance *IStl) Reject(err error) *XPPromiseImpl {
 	return RejectPromise(err)
 }
 
+func (instance *IStl) All(promises ...*XPPromiseImpl) *XPPromiseImpl {
+	return All(promises ...)
+}
+
+func (instance *IStl) Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
+	return Race(promises ...)
+}
+
 //SpinLocker
 func (instance *IStl) SpinLocker() *SpinLock {
 	return &SpinLock{}

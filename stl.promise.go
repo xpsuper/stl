@@ -15,9 +15,9 @@ type XPPromiseImpl struct {
 	state int
 	executor func(resolve func(interface{}), reject func(error))
 	then []func(data interface{}) interface{}
-	catch []func(error error) error
+	catch []func(err error) error
 	result interface{}
-	error error
+	err error
 	mutex *sync.Mutex
 	wg *sync.WaitGroup
 }
@@ -32,7 +32,7 @@ func NewPromise(executor func(resolve func(interface{}), reject func(error))) *X
 		then:     make([]func(interface{}) interface{}, 0),
 		catch:    make([]func(error) error, 0),
 		result:   nil,
-		error:    nil,
+		err:      nil,
 		mutex:    &sync.Mutex{},
 		wg:       wg,
 	}
@@ -45,22 +45,11 @@ func NewPromise(executor func(resolve func(interface{}), reject func(error))) *X
 	return promise
 }
 
-func ResolvePromise(resolution interface{}) *XPPromiseImpl {
-	return NewPromise(func(resolve func(interface{}), reject func(error)) {
-		resolve(resolution)
-	})
-}
-
-func RejectPromise(err error) *XPPromiseImpl {
-	return NewPromise(func(resolve func(interface{}), reject func(error)) {
-		reject(err)
-	})
-}
-
 func (promise *XPPromiseImpl) resolve(resolution interface{}) {
 	promise.mutex.Lock()
 
 	if promise.state != pending {
+		promise.mutex.Unlock()
 		return
 	}
 
@@ -103,7 +92,7 @@ func (promise *XPPromiseImpl) resolve(resolution interface{}) {
 	promise.mutex.Unlock()
 }
 
-func (promise *XPPromiseImpl) reject(error error) {
+func (promise *XPPromiseImpl) reject(err error) {
 	promise.mutex.Lock()
 	defer promise.mutex.Unlock()
 
@@ -111,7 +100,7 @@ func (promise *XPPromiseImpl) reject(error error) {
 		return
 	}
 
-	promise.error = error
+	promise.err = err
 
 	promise.wg.Done()
 	for range promise.then {
@@ -119,7 +108,7 @@ func (promise *XPPromiseImpl) reject(error error) {
 	}
 
 	for _, fn := range promise.catch {
-		promise.error = fn(promise.error)
+		promise.err = fn(promise.err)
 		promise.wg.Done()
 	}
 
@@ -137,10 +126,11 @@ func (promise *XPPromiseImpl) Then(fulfillment func(data interface{}) interface{
 	promise.mutex.Lock()
 	defer promise.mutex.Unlock()
 
-	if promise.state == pending {
+	switch promise.state {
+	case pending:
 		promise.wg.Add(1)
 		promise.then = append(promise.then, fulfillment)
-	} else if promise.state == fulfilled {
+	case fulfilled:
 		promise.result = fulfillment(promise.result)
 	}
 
@@ -151,11 +141,12 @@ func (promise *XPPromiseImpl) Catch(rejection func(error error) error) *XPPromis
 	promise.mutex.Lock()
 	defer promise.mutex.Unlock()
 
-	if promise.state == pending {
+	switch promise.state {
+	case pending:
 		promise.wg.Add(1)
 		promise.catch = append(promise.catch, rejection)
-	} else if promise.state == rejected {
-		promise.error = rejection(promise.error)
+	case rejected:
+		promise.err = rejection(promise.err)
 	}
 
 	return promise
@@ -163,5 +154,114 @@ func (promise *XPPromiseImpl) Catch(rejection func(error error) error) *XPPromis
 
 func (promise *XPPromiseImpl) Await() (interface{}, error) {
 	promise.wg.Wait()
-	return promise.result, promise.error
+	return promise.result, promise.err
+}
+
+func All(promises ...*XPPromiseImpl) *XPPromiseImpl {
+	psLen := len(promises)
+	if psLen == 0 {
+		return ResolvePromise(make([]interface{}, 0))
+	}
+
+	return NewPromise(func(resolve func(interface{}), reject func(error)) {
+		resolutionsChan := make(chan []interface{}, psLen)
+		errorChan := make(chan error, psLen)
+
+		for index, promise := range promises {
+			func(i int) {
+				promise.Then(func(data interface{}) interface{} {
+					resolutionsChan <- []interface{}{i, data}
+					return data
+				}).Catch(func(err error) error {
+					errorChan <- err
+					return err
+				})
+			}(index)
+		}
+
+		resolutions := make([]interface{}, psLen)
+		for x := 0; x < psLen; x++ {
+			select {
+			case resolution := <-resolutionsChan:
+				resolutions[resolution[0].(int)] = resolution[1]
+
+			case err := <-errorChan:
+				reject(err)
+				return
+			}
+		}
+		resolve(resolutions)
+	})
+}
+
+func Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
+	psLen := len(promises)
+	if psLen == 0 {
+		return ResolvePromise(nil)
+	}
+
+	return NewPromise(func(resolve func(interface{}), reject func(error)) {
+		resolutionsChan := make(chan interface{}, psLen)
+		errorChan := make(chan error, psLen)
+
+		for _, promise := range promises {
+			promise.Then(func(data interface{}) interface{} {
+				resolutionsChan <- data
+				return data
+			}).Catch(func(err error) error {
+				errorChan <- err
+				return err
+			})
+		}
+
+		select {
+		case resolution := <-resolutionsChan:
+			resolve(resolution)
+
+		case err := <-errorChan:
+			reject(err)
+		}
+	})
+}
+
+func AllSettled(promises ...*XPPromiseImpl) *XPPromiseImpl {
+	psLen := len(promises)
+	if psLen == 0 {
+		return ResolvePromise(make([]interface{}, 0))
+	}
+
+	return NewPromise(func(resolve func(interface{}), reject func(error)) {
+		resolutionsChan := make(chan []interface{}, psLen)
+
+		for index, promise := range promises {
+			func(i int) {
+				promise.Then(func(data interface{}) interface{} {
+					resolutionsChan <- []interface{}{i, data}
+					return data
+				}).Catch(func(err error) error {
+					resolutionsChan <- []interface{}{i, err}
+					return err
+				})
+			}(index)
+		}
+
+		resolutions := make([]interface{}, psLen)
+		for x := 0; x < psLen; x++ {
+			resolution := <-resolutionsChan
+			resolutions[resolution[0].(int)] = resolution[1]
+		}
+		resolve(resolutions)
+	})
+}
+
+func ResolvePromise(resolution interface{}) *XPPromiseImpl {
+	return NewPromise(func(resolve func(interface{}), reject func(error)) {
+		resolve(resolution)
+	})
+}
+
+func RejectPromise(err error) *XPPromiseImpl {
+	return NewPromise(func(resolve func(interface{}), reject func(error)) {
+		reject(err)
+	})
 }
