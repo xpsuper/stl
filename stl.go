@@ -1,5 +1,8 @@
 package stl
 
+import "github.com/xpsuper/stl/helper"
+import "github.com/xpsuper/stl/adapter"
+
 type IStl struct {
 	Array      *XPArrayImpl
 	Async      *XPAsyncImpl
@@ -13,6 +16,11 @@ type IStl struct {
 	String     *XPStringImpl
 	Scheduler  *XPSchedulerImpl
 	Zip        *XPZipImpl
+}
+
+//Adapter
+func (instance *IStl) AdapterDecode(input, output interface{}) error {
+	return adapter.WeakDecode(input, output)
 }
 
 //IpAddress
@@ -38,6 +46,15 @@ func (instance *IStl) FilePathCurrent() (filepath *XPFilePathImpl, err error) {
 //IdGenerator
 func (instance *IStl) IdGenerator(workerId int64) (idGenerator *XPIdGeneratorImpl, err error) {
 	return NewIdGenerator(workerId)
+}
+
+//Helper
+func (instance *IStl) Helper(v interface{}) helper.Helper {
+	return helper.Chain(v)
+}
+
+func (instance *IStl) HelperLazy(v interface{}) helper.Helper {
+	return helper.LazyChain(v)
 }
 
 //Http
