@@ -1,7 +1,11 @@
 package stl
 
-import "github.com/xpsuper/stl/helper"
-import "github.com/xpsuper/stl/adapter"
+import (
+	"github.com/xpsuper/stl/adapter"
+	"github.com/xpsuper/stl/helper"
+	"github.com/xpsuper/stl/memorycache"
+	"github.com/xpsuper/stl/taskbus"
+)
 
 type IStl struct {
 	Array      *XPArrayImpl
@@ -83,6 +87,11 @@ func (instance *IStl) JsonGet(json, path string) JsonItem {
 	return Get(json, path)
 }
 
+//MemoryCache
+func (instance *IStl) Cache(config *memorycache.Configuration) *memorycache.Cache {
+	return memorycache.NewCache(config)
+}
+
 //OrderMap
 func (instance *IStl) OrderMap(less OrderMapKeyLess) *OrderMap {
 	return NewOrderMap(less)
@@ -112,6 +121,24 @@ func (instance *IStl) Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
 //SpinLocker
 func (instance *IStl) SpinLocker() *SpinLock {
 	return &SpinLock{}
+}
+
+//TaskBus
+func (instance *IStl) TaskBusChain(stack taskbus.Tasks, firstArgs ...interface{}) ([]interface{}, error) {
+	return taskbus.Chain(stack, firstArgs ...)
+}
+
+func (instance *IStl) TaskBusMax(stack taskbus.Taskier) (taskbus.Results, error) {
+	return taskbus.Max(stack)
+}
+
+func (instance *IStl) TaskBusAll(stack taskbus.Taskier) (taskbus.Results, error) {
+	return taskbus.All(stack)
+}
+
+//TaskTicker
+func (instance *IStl) TaskTicker(scanInterval int, execOnStart bool) *TickerTasks {
+	return NewTicker(scanInterval, execOnStart)
 }
 
 var IMP IStl
