@@ -2,6 +2,7 @@ package stl
 
 import (
 	"github.com/xpsuper/stl/adapter"
+	"github.com/xpsuper/stl/dispatcher"
 	"github.com/xpsuper/stl/helper"
 	"github.com/xpsuper/stl/memorycache"
 	"github.com/xpsuper/stl/taskbus"
@@ -36,6 +37,11 @@ func (instance *IStl) ConfigIpAddress(keyFileUrl, dataFileUrl string) {
 //Interface Deep Copy
 func (instance *IStl) DeepCopy(src interface{}) *XPDeepCPImpl {
 	return DeepCopy(src)
+}
+
+//Dispatcher
+func (instance *IStl) Dispatcher(cnt int) (*dispatcher.Dispatcher, error)  {
+	return dispatcher.NewDispatcher(cnt)
 }
 
 //FilePath
