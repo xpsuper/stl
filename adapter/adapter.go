@@ -147,6 +147,22 @@ func WeakDecode(input, output interface{}) error {
 	return decoder.Decode(input)
 }
 
+func WeakDecodeByTag(input, output interface{}, tag string) error {
+	config := &DecoderConfig{
+		Metadata:         nil,
+		Result:           output,
+		WeaklyTypedInput: true,
+		TagName:          tag,
+	}
+
+	decoder, err := NewDecoder(config)
+	if err != nil {
+		return err
+	}
+
+	return decoder.Decode(input)
+}
+
 // DecodeMetadata is the same as Decode, but is shorthand to
 // enable metadata collection. See DecoderConfig for more info.
 func DecodeMetadata(input interface{}, output interface{}, metadata *Metadata) error {

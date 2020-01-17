@@ -28,6 +28,10 @@ func (instance *IStl) AdapterDecode(input, output interface{}) error {
 	return adapter.WeakDecode(input, output)
 }
 
+func (instance *IStl) AdapterDecodeByTag(input, output interface{}, tag string) error {
+	return adapter.WeakDecodeByTag(input, output, tag)
+}
+
 //IpAddress
 func (instance *IStl) ConfigIpAddress(keyFileUrl, dataFileUrl string) {
 	KeyFileUrl  = keyFileUrl
