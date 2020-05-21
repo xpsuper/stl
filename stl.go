@@ -8,6 +8,7 @@ import (
 	"github.com/xpsuper/stl/taskbus"
 	"github.com/xpsuper/stl/canvas"
 	"github.com/xpsuper/stl/srvmanager"
+	"image"
 )
 
 type IStl struct {
@@ -137,6 +138,14 @@ func (instance *IStl) SpinLocker() *SpinLock {
 
 func (instance *IStl) Canvas(width, height int) *canvas.Context {
 	return canvas.NewContext(width, height)
+}
+
+func (instance *IStl) CanvasForImage(img image.Image) *canvas.Context {
+	return canvas.NewContextForImage(img)
+}
+
+func (instance *IStl) CanvasForRGBA(rgba *image.RGBA) *canvas.Context {
+	return canvas.NewContextForRGBA(rgba)
 }
 
 func (instance *IStl) ServiceBind(fn func()) {
