@@ -6,6 +6,7 @@ import (
 	"github.com/xpsuper/stl/helper"
 	"github.com/xpsuper/stl/memorycache"
 	"github.com/xpsuper/stl/taskbus"
+	"github.com/xpsuper/stl/canvas"
 )
 
 type IStl struct {
@@ -131,6 +132,10 @@ func (instance *IStl) Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
 //SpinLocker
 func (instance *IStl) SpinLocker() *SpinLock {
 	return &SpinLock{}
+}
+
+func (instance *IStl) Canvas(width, height int) *canvas.Context {
+	return canvas.NewContext(width, height)
 }
 
 //TaskBus
