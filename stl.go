@@ -7,6 +7,7 @@ import (
 	"github.com/xpsuper/stl/memorycache"
 	"github.com/xpsuper/stl/taskbus"
 	"github.com/xpsuper/stl/canvas"
+	"github.com/xpsuper/stl/srvmanager"
 )
 
 type IStl struct {
@@ -136,6 +137,14 @@ func (instance *IStl) SpinLocker() *SpinLock {
 
 func (instance *IStl) Canvas(width, height int) *canvas.Context {
 	return canvas.NewContext(width, height)
+}
+
+func (instance *IStl) ServiceBind(fn func()) {
+	srvmanager.Bind(fn)
+}
+
+func (instance *IStl) ServiceWait() {
+	srvmanager.Wait()
 }
 
 //TaskBus
