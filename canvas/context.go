@@ -3,6 +3,7 @@ package canvas
 
 import (
 	"errors"
+	"golang.org/x/image/math/fixed"
 	"image"
 	"image/color"
 	"image/jpeg"
@@ -10,6 +11,7 @@ import (
 	"io"
 	"math"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/golang/freetype/raster"
 	"golang.org/x/image/draw"
@@ -848,6 +850,16 @@ func (dc *Context) MeasureString(s string) (w, h float64) {
 	}
 	a := d.MeasureString(s)
 	return float64(a >> 6), dc.fontHeight
+}
+
+func measureString(f font.Face, s string) (advance fixed.Int26_6) {
+	metrics := f.Metrics()
+	w := metrics.Height.Round()
+	return fixed.Int26_6(utf8.RuneCountInString(s) * w)
+}
+
+func (dc *Context) MeasureUnicodeString(s string) (w, h float64) {
+	return float64(measureString(dc.fontFace, s)), dc.fontHeight
 }
 
 // WordWrap wraps the specified string to the given max width and current
