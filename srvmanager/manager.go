@@ -43,7 +43,8 @@ func init() {
 		}
 	}
 	createPIDFileLockAndSet(pidPath, os.Getpid())
-	signalListen(signalChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
+	//signalListen(signalChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP)
+	signalListen(signalChan, syscall.SIGTERM, syscall.SIGINT)
 }
 
 // Привязываем функцию завершения
