@@ -178,7 +178,7 @@ func (instance *IStl) TaskTicker(scanInterval int, execOnStart bool) *TickerTask
 }
 
 //Evaluate
-func Eval(expression string, parameter interface{}, opts ...eval.Language) (interface{}, error) {
+func (instance *IStl) Eval(expression string, parameter interface{}, opts ...eval.Language) (interface{}, error) {
 	return eval.Evaluate(expression, parameter, opts ...)
 }
 
