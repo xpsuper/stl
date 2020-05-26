@@ -2,12 +2,13 @@ package stl
 
 import (
 	"github.com/xpsuper/stl/adapter"
+	"github.com/xpsuper/stl/canvas"
 	"github.com/xpsuper/stl/dispatcher"
+	"github.com/xpsuper/stl/eval"
 	"github.com/xpsuper/stl/helper"
 	"github.com/xpsuper/stl/memorycache"
-	"github.com/xpsuper/stl/taskbus"
-	"github.com/xpsuper/stl/canvas"
 	"github.com/xpsuper/stl/srvmanager"
+	"github.com/xpsuper/stl/taskbus"
 	"image"
 )
 
@@ -136,6 +137,7 @@ func (instance *IStl) SpinLocker() *SpinLock {
 	return &SpinLock{}
 }
 
+//Canvas
 func (instance *IStl) Canvas(width, height int) *canvas.Context {
 	return canvas.NewContext(width, height)
 }
@@ -148,6 +150,7 @@ func (instance *IStl) CanvasForRGBA(rgba *image.RGBA) *canvas.Context {
 	return canvas.NewContextForRGBA(rgba)
 }
 
+//ServiceManager
 func (instance *IStl) ServiceBind(fn func()) {
 	srvmanager.Bind(fn)
 }
@@ -172,6 +175,11 @@ func (instance *IStl) TaskBusAll(stack taskbus.Taskier) (taskbus.Results, error)
 //TaskTicker
 func (instance *IStl) TaskTicker(scanInterval int, execOnStart bool) *TickerTasks {
 	return NewTicker(scanInterval, execOnStart)
+}
+
+//Evaluate
+func Eval(expression string, parameter interface{}, opts ...eval.Language) (interface{}, error) {
+	return eval.Evaluate(expression, parameter, opts ...)
 }
 
 var IMP IStl
