@@ -29,7 +29,7 @@ var (
 	signalChan  chan os.Signal = make(chan os.Signal, 1)
 	appPath     string         = os.Args[0]
 	appName     string         = path.Base(appPath)
-	pidPath     string         = "./" + appName + ".pid"
+	pidPath     string         = path.Dir(appPath) + "/" + appName + ".pid"
 )
 
 // Инициализация
