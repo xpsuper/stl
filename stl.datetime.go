@@ -24,6 +24,8 @@ const  (
 	MM = "04"
 	SS = "05"
 	ss = "05"
+	III = "000"
+	iii = "000"
 	tt = "PM"
 	Z = "MST"
 	ZZZ = "MST"
@@ -85,7 +87,13 @@ func convertFormat(format string) string {
 	if strings.Contains(goFormat, "SS") {
 		goFormat = strings.Replace(goFormat, "SS", SS, -1)
 	} else if strings.Contains(goFormat, "ss"){
-		goFormat = strings.Replace(goFormat, "ss", SS, -1)
+		goFormat = strings.Replace(goFormat, "ss", ss, -1)
+	}
+
+	if strings.Contains(goFormat, "III") {
+		goFormat = strings.Replace(goFormat, "III", III, -1)
+	} else if strings.Contains(goFormat, "iii"){
+		goFormat = strings.Replace(goFormat, "iii", iii, -1)
 	}
 
 	if strings.Contains(goFormat, "ZZZ"){
