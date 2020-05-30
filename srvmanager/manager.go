@@ -61,7 +61,7 @@ func Wait() {
 	<-waitChan
 	Println(appName + " stopping... ")
 	<-doneChan
-	Println(" stopped!\n")
+	Println(appName + " stopped!\n")
 	os.Exit(0)
 }
 
