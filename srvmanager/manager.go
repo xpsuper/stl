@@ -59,7 +59,7 @@ func Bind(fn func()) {
 // Ждем пока не будет обработан выход
 func Wait() {
 	<-waitChan
-	Println(appName + "stopping... ")
+	Println(appName + " stopping... ")
 	<-doneChan
 	Println(" stopped!\n")
 	os.Exit(0)
