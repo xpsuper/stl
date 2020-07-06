@@ -241,6 +241,13 @@ func (h *XPHttpImpl) Header(key string, value string) *XPHttpImpl {
 	return h
 }
 
+func (h *XPHttpImpl) HeaderMap(headers map[string]string) *XPHttpImpl {
+	for k, v := range headers {
+		h.Headers[k] = v
+	}
+	return h
+}
+
 // 用于设置一个重试机制
 //
 // 例如 每隔5秒重试一次，最多重试3次，当状态为 StatusInternalServerError 或 StatusInternalServerError 时重试
