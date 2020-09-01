@@ -9,7 +9,9 @@ import (
 	"github.com/xpsuper/stl/memorycache"
 	"github.com/xpsuper/stl/srvmanager"
 	"github.com/xpsuper/stl/taskbus"
+	"github.com/xpsuper/stl/htmlparser"
 	"image"
+	"io"
 )
 
 type IStl struct {
@@ -180,6 +182,11 @@ func (instance *IStl) TaskTicker(scanInterval int, execOnStart bool) *TickerTask
 //Evaluate
 func (instance *IStl) Eval(expression string, parameter interface{}, opts ...eval.Language) (interface{}, error) {
 	return eval.Evaluate(expression, parameter, opts ...)
+}
+
+//HtmlParser
+func (instance *IStl) HtmlParser(r io.Reader) (*htmlparser.Node, error) {
+	return htmlparser.Parse(r)
 }
 
 var IMP IStl
