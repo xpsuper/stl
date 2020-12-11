@@ -6,10 +6,11 @@ import (
 	"github.com/xpsuper/stl/dispatcher"
 	"github.com/xpsuper/stl/eval"
 	"github.com/xpsuper/stl/helper"
+	"github.com/xpsuper/stl/htmlparser"
+	"github.com/xpsuper/stl/jwt"
 	"github.com/xpsuper/stl/memorycache"
 	"github.com/xpsuper/stl/srvmanager"
 	"github.com/xpsuper/stl/taskbus"
-	"github.com/xpsuper/stl/htmlparser"
 	"image"
 	"io"
 )
@@ -27,6 +28,7 @@ type IStl struct {
 	String     *XPStringImpl
 	Scheduler  *XPSchedulerImpl
 	Zip        *XPZipImpl
+	Jwt        *jwt.XPJwtImpl
 }
 
 //Adapter
@@ -205,5 +207,6 @@ func init()  {
 		String: &XPStringImpl{},
 		Scheduler: NewScheduler(),
 		Zip: &XPZipImpl{},
+		Jwt: &jwt.XPJwtImpl{},
 	}
 }
