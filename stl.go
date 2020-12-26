@@ -5,6 +5,7 @@ import (
 	"github.com/xpsuper/stl/canvas"
 	"github.com/xpsuper/stl/dispatcher"
 	"github.com/xpsuper/stl/eval"
+	"github.com/xpsuper/stl/excel"
 	"github.com/xpsuper/stl/helper"
 	"github.com/xpsuper/stl/htmlparser"
 	"github.com/xpsuper/stl/jwt"
@@ -189,6 +190,11 @@ func (instance *IStl) Eval(expression string, parameter interface{}, opts ...eva
 //HtmlParser
 func (instance *IStl) HtmlParser(r io.Reader) (*htmlparser.Node, error) {
 	return htmlparser.Parse(r)
+}
+
+//ExcelParser
+func (instance *IStl) ExcelParser(filePath string, container interface{}) error {
+	return excel.UnmarshalXLSX(filePath, container)
 }
 
 var IMP IStl
