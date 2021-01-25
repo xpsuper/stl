@@ -32,8 +32,7 @@ var (
 	pidPath     string         = path.Dir(appPath) + "/" + appName + ".pid"
 )
 
-// Инициализация
-func init() {
+func InitManage() {
 	if len(os.Args) > 1 {
 		name := os.Args[1]
 		for _, cmd := range commands {
@@ -47,7 +46,6 @@ func init() {
 	signalListen(signalChan, syscall.SIGTERM, syscall.SIGINT)
 }
 
-// Привязываем функцию завершения
 func Bind(fn func()) {
 	mutex.Lock()
 	c := make([]func(), 0, len(closerFuncs)+1)
@@ -56,7 +54,6 @@ func Bind(fn func()) {
 	mutex.Unlock()
 }
 
-// Ждем пока не будет обработан выход
 func Wait() {
 	<-waitChan
 	Println(appName + " stopping... ")
@@ -65,7 +62,6 @@ func Wait() {
 	os.Exit(0)
 }
 
-// Слушает сигналы завершения
 func signalListen(signalChan chan os.Signal, siganls ...os.Signal) {
 	signal.Notify(signalChan, siganls...)
 	go func() {
@@ -80,7 +76,6 @@ func signalListen(signalChan chan os.Signal, siganls ...os.Signal) {
 	}()
 }
 
-// Создаем pid файл, блокируем и сохраняем в него новый pid
 func createPIDFileLockAndSet(path string, pid int) {
 	pidFile := newPIDFile(path)
 	if err := pidFile.Lock(); err != nil {
@@ -91,7 +86,6 @@ func createPIDFileLockAndSet(path string, pid int) {
 	}
 }
 
-// Обертка над os.File для работы с PID файлом
 type pidFile struct {
 	*os.File
 }

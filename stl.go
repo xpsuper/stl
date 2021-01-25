@@ -157,6 +157,7 @@ func (instance *IStl) CanvasForRGBA(rgba *image.RGBA) *canvas.Context {
 
 //ServiceManager
 func (instance *IStl) ServiceBind(fn func()) {
+	srvmanager.InitManage()
 	srvmanager.Bind(fn)
 }
 
