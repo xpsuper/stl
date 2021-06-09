@@ -35,9 +35,19 @@ var (
 func InitManage() {
 	if len(os.Args) > 1 {
 		name := os.Args[1]
-		for _, cmd := range commands {
-			if cmd.Name == name {
-				os.Exit(cmd.Run())
+		if name == "start" {
+			pidFile := newPIDFile(pidPath)
+			if err := pidFile.Lock(); err != nil {
+				Println(appName + " already running!")
+				os.Exit(1)
+				return
+			}
+			_ = pidFile.Unlock()
+		} else {
+			for _, cmd := range commands {
+				if cmd.Name == name {
+					os.Exit(cmd.Run())
+				}
 			}
 		}
 	}
