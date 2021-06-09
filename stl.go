@@ -41,6 +41,11 @@ func (instance *IStl) AdapterDecodeByTag(input, output interface{}, tag string) 
 	return adapter.WeakDecodeByTag(input, output, tag)
 }
 
+//GoArray
+func (instance *IStl) GoArray() *GoArray {
+	return NewGoArray()
+}
+
 //IpAddress
 func (instance *IStl) ConfigIpAddress(keyFileUrl, dataFileUrl string) {
 	KeyFileUrl  = keyFileUrl
