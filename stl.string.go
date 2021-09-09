@@ -48,7 +48,7 @@ func (instance *XPStringImpl) ToString(data interface{}) (ok bool, result string
 		result = strconv.Itoa(int(data.(int32)))
 		break
 	case int64:
-		result = strconv.Itoa(int(data.(int64)))
+		result = strconv.FormatInt(data.(int64), 10)
 		break
 	case uint8:
 		result = strconv.FormatUint(uint64(data.(uint8)), 10)
