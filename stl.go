@@ -10,6 +10,7 @@ import (
 	"github.com/xpsuper/stl/htmlparser"
 	"github.com/xpsuper/stl/jwt"
 	"github.com/xpsuper/stl/memorycache"
+	"github.com/xpsuper/stl/objassigner"
 	"github.com/xpsuper/stl/srvmanager"
 	"github.com/xpsuper/stl/taskbus"
 	"image"
@@ -17,19 +18,19 @@ import (
 )
 
 type IStl struct {
-	Array      *XPArrayImpl
-	Async      *XPAsyncImpl
-	Config     *XPConfigImpl
-	DateTime   *XPDateTimeImpl
-	Encrypt    *XPEncryptImpl
-	IPAddress  *XPIPImpl
-	Number     *XPNumberImpl
-	Queue      *XPQueueImpl
-	Regexp     *XPRegexpImpl
-	String     *XPStringImpl
-	Scheduler  *XPSchedulerImpl
-	Zip        *XPZipImpl
-	Jwt        *jwt.XPJwtImpl
+	Array     *XPArrayImpl
+	Async     *XPAsyncImpl
+	Config    *XPConfigImpl
+	DateTime  *XPDateTimeImpl
+	Encrypt   *XPEncryptImpl
+	IPAddress *XPIPImpl
+	Number    *XPNumberImpl
+	Queue     *XPQueueImpl
+	Regexp    *XPRegexpImpl
+	String    *XPStringImpl
+	Scheduler *XPSchedulerImpl
+	Zip       *XPZipImpl
+	Jwt       *jwt.XPJwtImpl
 }
 
 //Adapter
@@ -48,7 +49,7 @@ func (instance *IStl) GoArray() *GoArray {
 
 //IpAddress
 func (instance *IStl) ConfigIpAddress(keyFileUrl, dataFileUrl string) {
-	KeyFileUrl  = keyFileUrl
+	KeyFileUrl = keyFileUrl
 	DataFileUrl = dataFileUrl
 }
 
@@ -58,7 +59,7 @@ func (instance *IStl) DeepCopy(src interface{}) *XPDeepCPImpl {
 }
 
 //Dispatcher
-func (instance *IStl) Dispatcher(cnt int) (*dispatcher.Dispatcher, error)  {
+func (instance *IStl) Dispatcher(cnt int) (*dispatcher.Dispatcher, error) {
 	return dispatcher.NewDispatcher(cnt)
 }
 
@@ -135,11 +136,11 @@ func (instance *IStl) Reject(err error) *XPPromiseImpl {
 }
 
 func (instance *IStl) All(promises ...*XPPromiseImpl) *XPPromiseImpl {
-	return All(promises ...)
+	return All(promises...)
 }
 
 func (instance *IStl) Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
-	return Race(promises ...)
+	return Race(promises...)
 }
 
 //SpinLocker
@@ -172,7 +173,7 @@ func (instance *IStl) ServiceWait() {
 
 //TaskBus
 func (instance *IStl) TaskBusChain(stack taskbus.Tasks, firstArgs ...interface{}) ([]interface{}, error) {
-	return taskbus.Chain(stack, firstArgs ...)
+	return taskbus.Chain(stack, firstArgs...)
 }
 
 func (instance *IStl) TaskBusMax(stack taskbus.Taskier) (taskbus.Results, error) {
@@ -190,7 +191,7 @@ func (instance *IStl) TaskTicker(scanInterval int, execOnStart bool) *TickerTask
 
 //Evaluate
 func (instance *IStl) Eval(expression string, parameter interface{}, opts ...eval.Language) (interface{}, error) {
-	return eval.Evaluate(expression, parameter, opts ...)
+	return eval.Evaluate(expression, parameter, opts...)
 }
 
 //HtmlParser
@@ -203,22 +204,30 @@ func (instance *IStl) ExcelParser(filePath string, container interface{}) error 
 	return excel.UnmarshalXLSX(filePath, container)
 }
 
+func (instance *IStl) ObjAssign(target, source interface{}) error {
+	return objassigner.Assign(target, source)
+}
+
+func (instance *IStl) ObjAssignWithOption(target, source interface{}, opt objassigner.Option) error {
+	return objassigner.AssignWithOption(target, source, opt)
+}
+
 var IMP IStl
 
-func init()  {
+func init() {
 	IMP = IStl{
-		Array:  &XPArrayImpl{},
-		Async:  NewAsync(),
-		Config: NewXPConfig(nil),
-		DateTime: &XPDateTimeImpl{},
-		Encrypt: &XPEncryptImpl{},
+		Array:     &XPArrayImpl{},
+		Async:     NewAsync(),
+		Config:    NewXPConfig(nil),
+		DateTime:  &XPDateTimeImpl{},
+		Encrypt:   &XPEncryptImpl{},
 		IPAddress: NewIPAddress(),
-		Number:  &XPNumberImpl{},
-		Queue: NewXPQueue(500),
-		Regexp: &XPRegexpImpl{},
-		String: &XPStringImpl{},
+		Number:    &XPNumberImpl{},
+		Queue:     NewXPQueue(500),
+		Regexp:    &XPRegexpImpl{},
+		String:    &XPStringImpl{},
 		Scheduler: NewScheduler(),
-		Zip: &XPZipImpl{},
-		Jwt: &jwt.XPJwtImpl{},
+		Zip:       &XPZipImpl{},
+		Jwt:       &jwt.XPJwtImpl{},
 	}
 }
