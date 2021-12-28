@@ -12,14 +12,14 @@ const (
 )
 
 type XPPromiseImpl struct {
-	state int
+	state    int
 	executor func(resolve func(interface{}), reject func(error))
-	then []func(data interface{}) interface{}
-	catch []func(err error) error
-	result interface{}
-	err error
-	mutex *sync.Mutex
-	wg *sync.WaitGroup
+	then     []func(data interface{}) interface{}
+	catch    []func(err error) error
+	result   interface{}
+	err      error
+	mutex    *sync.Mutex
+	wg       *sync.WaitGroup
 }
 
 func NewPromise(executor func(resolve func(interface{}), reject func(error))) *XPPromiseImpl {
@@ -157,7 +157,7 @@ func (promise *XPPromiseImpl) Await() (interface{}, error) {
 	return promise.result, promise.err
 }
 
-func All(promises ...*XPPromiseImpl) *XPPromiseImpl {
+func PromiseAll(promises ...*XPPromiseImpl) *XPPromiseImpl {
 	psLen := len(promises)
 	if psLen == 0 {
 		return ResolvePromise(make([]interface{}, 0))
@@ -194,7 +194,7 @@ func All(promises ...*XPPromiseImpl) *XPPromiseImpl {
 	})
 }
 
-func Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
+func PromiseRace(promises ...*XPPromiseImpl) *XPPromiseImpl {
 	psLen := len(promises)
 	if psLen == 0 {
 		return ResolvePromise(nil)

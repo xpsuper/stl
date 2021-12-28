@@ -17,217 +17,214 @@ import (
 	"io"
 )
 
-type IStl struct {
+var (
+	S         *XPStringImpl
+	N         *XPNumberImpl
+	DateTime  *XPDateTimeImpl
 	Array     *XPArrayImpl
 	Async     *XPAsyncImpl
 	Config    *XPConfigImpl
-	DateTime  *XPDateTimeImpl
 	Encrypt   *XPEncryptImpl
 	IPAddress *XPIPImpl
-	Number    *XPNumberImpl
 	Queue     *XPQueueImpl
 	Regexp    *XPRegexpImpl
-	String    *XPStringImpl
 	Scheduler *XPSchedulerImpl
 	Zip       *XPZipImpl
 	Jwt       *jwt.XPJwtImpl
+)
+
+func init() {
+	S = &XPStringImpl{}
+	N = &XPNumberImpl{}
+	Array = &XPArrayImpl{}
+	DateTime = &XPDateTimeImpl{}
+	Async = NewAsync()
+	Config = NewXPConfig(nil)
+	Encrypt = &XPEncryptImpl{}
+	IPAddress = NewIPAddress()
+	Queue = NewXPQueue(500)
+	Regexp = &XPRegexpImpl{}
+	Scheduler = NewScheduler()
+	Zip = &XPZipImpl{}
+	Jwt = &jwt.XPJwtImpl{}
 }
 
-//Adapter
-func (instance *IStl) AdapterDecode(input, output interface{}) error {
+// AdapterDecode 对象转换适配器
+func AdapterDecode(input, output interface{}) error {
 	return adapter.WeakDecode(input, output)
 }
 
-func (instance *IStl) AdapterDecodeByTag(input, output interface{}, tag string) error {
+// AdapterDecodeByTag 对象转换-自定义标签适配器
+func AdapterDecodeByTag(input, output interface{}, tag string) error {
 	return adapter.WeakDecodeByTag(input, output, tag)
 }
 
-//GoArray
-func (instance *IStl) GoArray() *GoArray {
-	return NewGoArray()
-}
-
-//IpAddress
-func (instance *IStl) ConfigIpAddress(keyFileUrl, dataFileUrl string) {
+// ConfigIpAddress 纯真IP库配置
+func ConfigIpAddress(keyFileUrl, dataFileUrl string) {
 	KeyFileUrl = keyFileUrl
 	DataFileUrl = dataFileUrl
 }
 
-//Interface Deep Copy
-func (instance *IStl) DeepCopy(src interface{}) *XPDeepCPImpl {
-	return DeepCopy(src)
-}
-
-//Dispatcher
-func (instance *IStl) Dispatcher(cnt int) (*dispatcher.Dispatcher, error) {
+// Dispatcher 任务分发器
+func Dispatcher(cnt int) (*dispatcher.Dispatcher, error) {
 	return dispatcher.NewDispatcher(cnt)
 }
 
-//FilePath
-func (instance *IStl) FilePath(path string) (filepath *XPFilePathImpl, err error) {
+// FilePath 获取文件路径对象
+func FilePath(path string) (filepath *XPFilePathImpl, err error) {
 	return NewFilePath(path)
 }
 
-func (instance *IStl) FilePathCurrent() (filepath *XPFilePathImpl, err error) {
+func FilePathCurrent() (filepath *XPFilePathImpl, err error) {
 	return NewFilePathFromCurrentPath()
 }
 
-//IdGenerator
-func (instance *IStl) IdGenerator(workerId int64) (idGenerator *XPIdGeneratorImpl, err error) {
+// IdGenerator 唯一ID生成器
+func IdGenerator(workerId int64) (idGenerator *XPIdGeneratorImpl, err error) {
 	return NewIdGenerator(workerId)
 }
 
-//Helper
-func (instance *IStl) Helper(v interface{}) helper.Helper {
+// Helper 帮助类
+func Helper(v interface{}) helper.Helper {
 	return helper.Chain(v)
 }
 
-func (instance *IStl) HelperLazy(v interface{}) helper.Helper {
+func HelperLazy(v interface{}) helper.Helper {
 	return helper.LazyChain(v)
 }
 
-//Http
-func (instance *IStl) Http() *XPHttpImpl {
+// Http HttpClient
+func Http() *XPHttpImpl {
 	return NewHttp()
 }
 
-//Json
-func (instance *IStl) JsonValid(json string) bool {
+// JsonValid Json对象验证器
+func JsonValid(json string) bool {
 	return Valid(json)
 }
 
-func (instance *IStl) JsonDataValid(json []byte) bool {
+func JsonDataValid(json []byte) bool {
 	return ValidBytes(json)
 }
 
-func (instance *IStl) JsonParse(json string) JsonItem {
+func JsonParse(json string) JsonItem {
 	return Parse(json)
 }
 
-func (instance *IStl) JsonDataParse(json []byte) JsonItem {
+func JsonDataParse(json []byte) JsonItem {
 	return ParseBytes(json)
 }
 
-func (instance *IStl) JsonGet(json, path string) JsonItem {
+func JsonGet(json, path string) JsonItem {
 	return Get(json, path)
 }
 
-//MemoryCache
-func (instance *IStl) Cache(config *memorycache.Configuration) *memorycache.Cache {
+// Cache MemoryCache
+func Cache(config *memorycache.Configuration) *memorycache.Cache {
 	return memorycache.NewCache(config)
 }
 
-//OrderMap
-func (instance *IStl) OrderMap(less OrderMapKeyLess) *OrderMap {
+// MapWithOrder 排序的map
+func MapWithOrder(less OrderMapKeyLess) *OrderMap {
 	return NewOrderMap(less)
 }
 
-//Promise
-func (instance *IStl) Promise(executor func(resolve func(interface{}), reject func(error))) *XPPromiseImpl {
+// Promise 异步执行
+func Promise(executor func(resolve func(interface{}), reject func(error))) *XPPromiseImpl {
 	return NewPromise(executor)
 }
 
-func (instance *IStl) Resolve(resolution interface{}) *XPPromiseImpl {
+func Resolve(resolution interface{}) *XPPromiseImpl {
 	return ResolvePromise(resolution)
 }
 
-func (instance *IStl) Reject(err error) *XPPromiseImpl {
+func Reject(err error) *XPPromiseImpl {
 	return RejectPromise(err)
 }
 
-func (instance *IStl) All(promises ...*XPPromiseImpl) *XPPromiseImpl {
-	return All(promises...)
+func All(promises ...*XPPromiseImpl) *XPPromiseImpl {
+	return PromiseAll(promises...)
 }
 
-func (instance *IStl) Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
-	return Race(promises...)
+func Race(promises ...*XPPromiseImpl) *XPPromiseImpl {
+	return PromiseRace(promises...)
 }
 
-//SpinLocker
-func (instance *IStl) SpinLocker() *SpinLock {
+// SpinLocker 自旋锁
+func SpinLocker() *SpinLock {
 	return &SpinLock{}
 }
 
-//Canvas
-func (instance *IStl) Canvas(width, height int) *canvas.Context {
+// Canvas 画布
+func Canvas(width, height int) *canvas.Context {
 	return canvas.NewContext(width, height)
 }
 
-func (instance *IStl) CanvasForImage(img image.Image) *canvas.Context {
+func CanvasForImage(img image.Image) *canvas.Context {
 	return canvas.NewContextForImage(img)
 }
 
-func (instance *IStl) CanvasForRGBA(rgba *image.RGBA) *canvas.Context {
+func CanvasForRGBA(rgba *image.RGBA) *canvas.Context {
 	return canvas.NewContextForRGBA(rgba)
 }
 
-//ServiceManager
-func (instance *IStl) ServiceBind(fn func()) {
+// ServiceBind ServiceManager 服务管理器
+func ServiceBind(fn func()) {
 	srvmanager.InitManage()
 	srvmanager.Bind(fn)
 }
 
-func (instance *IStl) ServiceWait() {
+// ServiceWait ServiceManager 服务管理器
+func ServiceWait() {
 	srvmanager.Wait()
 }
 
-//TaskBus
-func (instance *IStl) TaskBusChain(stack taskbus.Tasks, firstArgs ...interface{}) ([]interface{}, error) {
+// TaskBusChain TaskBus 异步任务总线
+func TaskBusChain(stack taskbus.Tasks, firstArgs ...interface{}) ([]interface{}, error) {
 	return taskbus.Chain(stack, firstArgs...)
 }
 
-func (instance *IStl) TaskBusMax(stack taskbus.Taskier) (taskbus.Results, error) {
+// TaskBusMax TaskBus 异步任务总线
+func TaskBusMax(stack taskbus.Taskier) (taskbus.Results, error) {
 	return taskbus.Max(stack)
 }
 
-func (instance *IStl) TaskBusAll(stack taskbus.Taskier) (taskbus.Results, error) {
+// TaskBusAll TaskBus 异步任务总线
+func TaskBusAll(stack taskbus.Taskier) (taskbus.Results, error) {
 	return taskbus.All(stack)
 }
 
-//TaskTicker
-func (instance *IStl) TaskTicker(scanInterval int, execOnStart bool) *TickerTasks {
+// TaskTicker 定时任务
+func TaskTicker(scanInterval int, execOnStart bool) *TickerTasks {
 	return NewTicker(scanInterval, execOnStart)
 }
 
-//Evaluate
-func (instance *IStl) Eval(expression string, parameter interface{}, opts ...eval.Language) (interface{}, error) {
+// Eval	执行表达式
+func Eval(expression string, parameter interface{}, opts ...eval.Language) (interface{}, error) {
 	return eval.Evaluate(expression, parameter, opts...)
 }
 
-//HtmlParser
-func (instance *IStl) HtmlParser(r io.Reader) (*htmlparser.Node, error) {
+// HtmlParser 解析html
+func HtmlParser(r io.Reader) (*htmlparser.Node, error) {
 	return htmlparser.Parse(r)
 }
 
-//ExcelParser
-func (instance *IStl) ExcelParser(filePath string, container interface{}) error {
+// ExcelParser 解析Excel
+func ExcelParser(filePath string, container interface{}) error {
 	return excel.UnmarshalXLSX(filePath, container)
 }
 
-func (instance *IStl) ObjAssign(target, source interface{}) error {
+// ObjDeepCopy Interface Deep Copy
+func ObjDeepCopy(src interface{}) *XPDeepCPImpl {
+	return DeepCopy(src)
+}
+
+// ObjAssign Interface Assign
+func ObjAssign(target, source interface{}) error {
 	return objassigner.Assign(target, source)
 }
 
-func (instance *IStl) ObjAssignWithOption(target, source interface{}, opt objassigner.Option) error {
+// ObjAssignWithOption Interface Assign With Option
+func ObjAssignWithOption(target, source interface{}, opt objassigner.Option) error {
 	return objassigner.AssignWithOption(target, source, opt)
-}
-
-var IMP IStl
-
-func init() {
-	IMP = IStl{
-		Array:     &XPArrayImpl{},
-		Async:     NewAsync(),
-		Config:    NewXPConfig(nil),
-		DateTime:  &XPDateTimeImpl{},
-		Encrypt:   &XPEncryptImpl{},
-		IPAddress: NewIPAddress(),
-		Number:    &XPNumberImpl{},
-		Queue:     NewXPQueue(500),
-		Regexp:    &XPRegexpImpl{},
-		String:    &XPStringImpl{},
-		Scheduler: NewScheduler(),
-		Zip:       &XPZipImpl{},
-		Jwt:       &jwt.XPJwtImpl{},
-	}
 }
