@@ -12,7 +12,6 @@ import (
 	"html"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"net/url"
 	"path/filepath"
 	"reflect"
@@ -26,7 +25,6 @@ import (
 )
 
 type XPStringImpl struct {
-
 }
 
 func (instance *XPStringImpl) ToString(data interface{}) (ok bool, result string) {
@@ -141,28 +139,32 @@ func (instance *XPStringImpl) UrlDecode(str string) (result string, err error) {
 	}
 }
 
-func (instance *XPStringImpl) Uppercase(str string) (result string)  {
+func (instance *XPStringImpl) Uppercase(str string) (result string) {
 	return strings.ToUpper(str)
 }
 
-func (instance *XPStringImpl) Lowercase(str string) (result string)  {
+func (instance *XPStringImpl) Lowercase(str string) (result string) {
 	return strings.ToLower(str)
 }
 
-func (instance *XPStringImpl) Join(s ...string) string {
+func (instance *XPStringImpl) Join(elems []string, sep string) string {
+	return strings.Join(elems, sep)
+}
+
+func (instance *XPStringImpl) Splice(s ...string) string {
 	var b strings.Builder
-	l:=len(s)
-	for i:=0;i<l;i++{
+	l := len(s)
+	for i := 0; i < l; i++ {
 		b.WriteString(s[i])
 	}
 	return b.String()
 }
 
-func (instance *XPStringImpl) JoinWithCap(s []string, cap int) string  {
+func (instance *XPStringImpl) SpliceWithCap(s []string, cap int) string {
 	var b strings.Builder
-	l:=len(s)
+	l := len(s)
 	b.Grow(cap)
-	for i:=0;i<l;i++{
+	for i := 0; i < l; i++ {
 		b.WriteString(s[i])
 	}
 	return b.String()
@@ -174,7 +176,7 @@ func (instance *XPStringImpl) Split(str, sep string) []string {
 
 func (instance *XPStringImpl) IndexOfSubString(str string, substr string) int {
 	// 子串在字符串的字节位置
-	result := strings.Index(str,substr)
+	result := strings.Index(str, substr)
 
 	if result >= 0 {
 		// 获得子串之前的字符串并转换成[]byte
@@ -190,7 +192,7 @@ func (instance *XPStringImpl) IndexOfSubString(str string, substr string) int {
 
 func (instance *XPStringImpl) SubString(str string, start, length int) (substr string) {
 	// 将字符串的转换成[]rune
-	rs  := []rune(str)
+	rs := []rune(str)
 	lth := len(rs)
 
 	// 简单的越界判断
@@ -212,7 +214,7 @@ func (instance *XPStringImpl) SubString(str string, start, length int) (substr s
 }
 
 func (instance *XPStringImpl) Format(format string, a ...interface{}) string {
-	return fmt.Sprintf(format, a ...)
+	return fmt.Sprintf(format, a...)
 }
 
 func (instance *XPStringImpl) Replace(str, old, new string) string {
@@ -272,114 +274,6 @@ func (instance *XPStringImpl) IsNumeric(str string) bool {
 		return r.Match([]byte(str))
 	}
 	return false
-}
-
-func (instance *XPStringImpl) Random(length int) string {
-	if length == 0 {
-		return ""
-	}
-
-	var seed = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
-
-	seedLen := len(seed)
-	if seedLen < 2 || seedLen > 256 {
-		panic("Wrong charset length for NewLenChars()")
-	}
-
-	max := 255 - (256 % seedLen)
-	b := make([]byte, length)
-	r := make([]byte, length+(length/4))
-	i := 0
-
-	for {
-		if _, e := rand.Read(r); e != nil {
-			return ""
-		}
-
-		for _, rb := range r {
-			c := int(rb)
-			if c > max {
-				continue
-			}
-			b[i] = seed[c%seedLen]
-			i++
-			if i == length {
-				return string(b)
-			}
-		}
-	}
-}
-
-func (instance *XPStringImpl) RandomOnlyNumber(length int) string {
-	if length == 0 {
-		return ""
-	}
-
-	var seed = []byte("0123456789")
-
-	seedLen := len(seed)
-	if seedLen < 2 || seedLen > 256 {
-		panic("Wrong charset length for NewLenChars()")
-	}
-
-	max := 255 - (256 % seedLen)
-	b := make([]byte, length)
-	r := make([]byte, length+(length/4))
-	i := 0
-
-	for {
-		if _, e := rand.Read(r); e != nil {
-			return ""
-		}
-
-		for _, rb := range r {
-			c := int(rb)
-			if c > max {
-				continue
-			}
-			b[i] = seed[c%seedLen]
-			i++
-			if i == length {
-				return string(b)
-			}
-		}
-	}
-}
-
-func (instance *XPStringImpl) RandomWithSeed(length int, seed string) string {
-	if length == 0 {
-		return ""
-	}
-
-	var seedByte = []byte(seed)
-
-	seedLen := len(seedByte)
-	if seedLen < 2 || seedLen > 256 {
-		panic("Wrong charset length for NewLenChars()")
-	}
-
-	max := 255 - (256 % seedLen)
-	b := make([]byte, length)
-	r := make([]byte, length+(length/4))
-	i := 0
-
-	for {
-		if _, e := rand.Read(r); e != nil {
-			return ""
-		}
-
-		for _, rb := range r {
-			c := int(rb)
-			if c > max {
-				continue
-			}
-			b[i] = seedByte[c%seedLen]
-			i++
-			if i == length {
-				return string(b)
-			}
-		}
-	}
 }
 
 /**

@@ -2,13 +2,10 @@ package stl
 
 import (
 	"math"
-	"math/rand"
 	"strconv"
-	"time"
 )
 
 type XPNumberImpl struct {
-
 }
 
 func (instance *XPNumberImpl) Abs(n int64) int64 {
@@ -37,68 +34,15 @@ func (instance *XPNumberImpl) Round(x float64) (result int64) {
 }
 
 func (instance *XPNumberImpl) EqualsFloat32(a, b float32) bool {
-	const ePSINON float32 = 0.00001;
-	c := a - b;
-	return (c >= - ePSINON) && (c <= ePSINON);
+	const ePSINON float32 = 0.00001
+	c := a - b
+	return (c >= -ePSINON) && (c <= ePSINON)
 }
 
 func (instance *XPNumberImpl) EqualsFloat64(a, b float64) bool {
-	const ePSINON float64 = 0.00000001;
-	c := a - b;
-	return (c >= - ePSINON) && (c <= ePSINON);
-}
-
-// 获取范围为[0.0, 1.0)，类型为float32的随机小数
-
-func (instance *XPNumberImpl) RandomFloat32() float32 {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return r.Float32()
-}
-
-// 获取范围为[0.0, 1.0)，类型为float64的随机小数
-
-func (instance *XPNumberImpl) RandomFloat64() float64 {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return r.Float64()
-}
-
-func (instance *XPNumberImpl) RandomInt(max int) int {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return r.Intn(max)
-}
-
-func (instance *XPNumberImpl) RandomIntRange(min, max int) int {
-	if min >= max || max == 0 {
-		return max
-	}
-
-	return rand.Intn(max-min) + min
-}
-
-func (instance *XPNumberImpl) RandomInt32(max int32) int32 {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return r.Int31n(max)
-}
-
-func (instance *XPNumberImpl) RandomInt32Range(min, max int32) int32 {
-	if min >= max || max == 0 {
-		return max
-	}
-
-	return rand.Int31n(max-min) + min
-}
-
-func (instance *XPNumberImpl) RandomInt64(max int64) int64 {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	return r.Int63n(max)
-}
-
-func (instance *XPNumberImpl) RandomInt64Range(min, max int64) int64 {
-	if min >= max || max == 0 {
-		return max
-	}
-
-	return rand.Int63n(max-min) + min
+	const ePSINON float64 = 0.00000001
+	c := a - b
+	return (c >= -ePSINON) && (c <= ePSINON)
 }
 
 func (instance *XPNumberImpl) ToInt64(data interface{}) (ok bool, result int64) {

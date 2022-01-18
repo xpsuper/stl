@@ -20,6 +20,7 @@ import (
 var (
 	S         *XPStringImpl
 	N         *XPNumberImpl
+	Random    *XPRandomImpl
 	DateTime  *XPDateTimeImpl
 	Array     *XPArrayImpl
 	Async     *XPAsyncImpl
@@ -36,6 +37,7 @@ var (
 func init() {
 	S = &XPStringImpl{}
 	N = &XPNumberImpl{}
+	Random = &XPRandomImpl{}
 	Array = &XPArrayImpl{}
 	DateTime = &XPDateTimeImpl{}
 	Async = NewAsync()
@@ -47,6 +49,19 @@ func init() {
 	Scheduler = NewScheduler()
 	Zip = &XPZipImpl{}
 	Jwt = &jwt.XPJwtImpl{}
+}
+
+func IsEmpty(data interface{}) bool {
+	if data == nil {
+		return true
+	}
+	switch data.(type) {
+	case string:
+		return S.IsEmpty(data.(string))
+	case []interface{}:
+		return len(data.([]interface{})) == 0
+	}
+	return false
 }
 
 // AdapterDecode 对象转换适配器
