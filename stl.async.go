@@ -10,7 +10,7 @@ type asyncRun struct {
 	Params  []reflect.Value
 }
 
-// Async 异步执行对象
+// XPAsyncImpl 异步执行对象
 type XPAsyncImpl struct {
 	count int
 	tasks map[string]asyncRun

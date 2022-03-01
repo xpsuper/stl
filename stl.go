@@ -1,6 +1,9 @@
 package stl
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/xpsuper/stl/adapter"
 	"github.com/xpsuper/stl/canvas"
 	"github.com/xpsuper/stl/dispatcher"
@@ -51,6 +54,7 @@ func init() {
 	Jwt = &jwt.XPJwtImpl{}
 }
 
+// IsEmpty 判断是否为空
 func IsEmpty(data interface{}) bool {
 	if data == nil {
 		return true
@@ -62,6 +66,44 @@ func IsEmpty(data interface{}) bool {
 		return len(data.([]interface{})) == 0
 	}
 	return false
+}
+
+// ToJson 转为 Json 字符串
+func ToJson(data interface{}) string {
+	jsonByte, err := json.Marshal(data)
+	if err != nil {
+		fmt.Printf("Marshal with error: %+v\n", err)
+		return "{}"
+	}
+	return string(jsonByte)
+}
+
+// ToJsonIndent 转为 Json 格式化字符串
+func ToJsonIndent(data interface{}) string {
+	b, err := json.Marshal(data)
+	if err != nil {
+		fmt.Printf("Marshal with error: %+v\n", err)
+		return "{}"
+	}
+	var out bytes.Buffer
+	err = json.Indent(&out, b, "", "    ")
+	return out.String()
+}
+
+// ToMap 转为 map
+func ToMap(data interface{}) map[string]interface{} {
+	jsonByte, err := json.Marshal(data)
+	if err != nil {
+		fmt.Printf("Marshal with error: %+v\n", err)
+		return nil
+	}
+	m := make(map[string]interface{})
+	err = json.Unmarshal(jsonByte, &m)
+	if err != nil {
+		fmt.Printf("Unmarshal with error: %+v\n", err)
+		return nil
+	}
+	return m
 }
 
 // AdapterDecode 对象转换适配器

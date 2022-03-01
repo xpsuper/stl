@@ -27,6 +27,7 @@ import (
 type XPStringImpl struct {
 }
 
+// ToString 任意类型转换为string
 func (instance *XPStringImpl) ToString(data interface{}) (ok bool, result string) {
 	ok = true
 	switch data.(type) {
@@ -84,6 +85,7 @@ func (instance *XPStringImpl) ToString(data interface{}) (ok bool, result string
 	return ok, result
 }
 
+// ToStringDef 任意类型转换为string, 可自定义无法转换时的默认值
 func (instance *XPStringImpl) ToStringDef(data interface{}, defaultValue ...string) string {
 	ok, r := instance.ToString(data)
 	if ok {
@@ -97,26 +99,48 @@ func (instance *XPStringImpl) ToStringDef(data interface{}, defaultValue ...stri
 	}
 }
 
+// SHA1 字符串SHA1值
 func (instance *XPStringImpl) SHA1(str string) string {
 	hashS := sha1.New()
 	hashS.Write([]byte(str))
 	return hex.EncodeToString(hashS.Sum(nil))
 }
 
+// CRC32 字符串CRC32值
 func (instance *XPStringImpl) CRC32(str string) uint32 {
 	return crc32.ChecksumIEEE([]byte(str))
 }
 
+// MD5 字符串MD5值
 func (instance *XPStringImpl) MD5(str string) string {
 	hashS := md5.New()
 	hashS.Write([]byte(str))
 	return hex.EncodeToString(hashS.Sum(nil))
 }
 
+// MD5Salt 字符串MD5值+盐值
+func (instance *XPStringImpl) MD5Salt(str string, salt string, iteration int) string {
+	b := []byte(str)
+	s := []byte(salt)
+	h := md5.New()
+	h.Write(s) // Write salt
+	h.Write(b) // Write str
+	var res []byte
+	res = h.Sum(nil)
+	for i := 0; i < iteration-1; i++ {
+		h.Reset()
+		h.Write(res)
+		res = h.Sum(nil)
+	}
+	return hex.EncodeToString(res)
+}
+
+// Base64Encode 字符串Base64编码
 func (instance *XPStringImpl) Base64Encode(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
 }
 
+// Base64Decode 字符串Base64解码
 func (instance *XPStringImpl) Base64Decode(str string) (result string, err error) {
 	r, e := base64.StdEncoding.DecodeString(str)
 	if e != nil {
@@ -126,10 +150,12 @@ func (instance *XPStringImpl) Base64Decode(str string) (result string, err error
 	}
 }
 
+// UrlEncode 字符串URL编码
 func (instance *XPStringImpl) UrlEncode(str string) string {
 	return url.QueryEscape(str)
 }
 
+// UrlDecode 字符串URL解码
 func (instance *XPStringImpl) UrlDecode(str string) (result string, err error) {
 	r, e := url.QueryUnescape(str)
 	if e != nil {
@@ -139,18 +165,22 @@ func (instance *XPStringImpl) UrlDecode(str string) (result string, err error) {
 	}
 }
 
+// Uppercase 字符串大写
 func (instance *XPStringImpl) Uppercase(str string) (result string) {
 	return strings.ToUpper(str)
 }
 
+// Lowercase 字符串小写
 func (instance *XPStringImpl) Lowercase(str string) (result string) {
 	return strings.ToLower(str)
 }
 
+// Join 字符串切片拼接成字符串,可自定义分隔符
 func (instance *XPStringImpl) Join(elems []string, sep string) string {
 	return strings.Join(elems, sep)
 }
 
+// Splice 字符串拼接
 func (instance *XPStringImpl) Splice(s ...string) string {
 	var b strings.Builder
 	l := len(s)
@@ -160,6 +190,7 @@ func (instance *XPStringImpl) Splice(s ...string) string {
 	return b.String()
 }
 
+// SpliceWithCap 字符串拼接
 func (instance *XPStringImpl) SpliceWithCap(s []string, cap int) string {
 	var b strings.Builder
 	l := len(s)
@@ -170,10 +201,12 @@ func (instance *XPStringImpl) SpliceWithCap(s []string, cap int) string {
 	return b.String()
 }
 
+// Split 字符串分割
 func (instance *XPStringImpl) Split(str, sep string) []string {
 	return strings.Split(str, sep)
 }
 
+// IndexOfSubString 子串索引,没找到返回-1
 func (instance *XPStringImpl) IndexOfSubString(str string, substr string) int {
 	// 子串在字符串的字节位置
 	result := strings.Index(str, substr)
@@ -190,6 +223,7 @@ func (instance *XPStringImpl) IndexOfSubString(str string, substr string) int {
 	return result
 }
 
+// SubString 按开始索引及长度截取字符串子串
 func (instance *XPStringImpl) SubString(str string, start, length int) (substr string) {
 	// 将字符串的转换成[]rune
 	rs := []rune(str)
@@ -213,46 +247,57 @@ func (instance *XPStringImpl) SubString(str string, start, length int) (substr s
 	return string(rs[start:end])
 }
 
+// Format 字符串格式化
 func (instance *XPStringImpl) Format(format string, a ...interface{}) string {
 	return fmt.Sprintf(format, a...)
 }
 
+// Replace 字符串替换
 func (instance *XPStringImpl) Replace(str, old, new string) string {
 	return strings.ReplaceAll(str, old, new)
 }
 
+// Trim 字符串消除前后空格
 func (instance *XPStringImpl) Trim(str string) string {
 	return strings.Trim(str, " ")
 }
 
+// TrimLeft 字符串消除前面空格
 func (instance *XPStringImpl) TrimLeft(str string) string {
 	return strings.TrimLeft(str, " ")
 }
 
+// TrimRight 字符串消除后面空格
 func (instance *XPStringImpl) TrimRight(str string) string {
 	return strings.TrimRight(str, " ")
 }
 
+// Equal 字符串比较
 func (instance *XPStringImpl) Equal(source, target string) bool {
 	return strings.EqualFold(source, target)
 }
 
+// EqualIgnoreCase 字符串忽略大小写比较
 func (instance *XPStringImpl) EqualIgnoreCase(source, target string) bool {
 	return strings.EqualFold(strings.ToLower(source), strings.ToLower(target))
 }
 
+// StartWith 字符串是否以 xx 开始
 func (instance *XPStringImpl) StartWith(str, prefix string) bool {
 	return strings.HasPrefix(str, prefix)
 }
 
+// EndWith 字符串是否以 xx 结束
 func (instance *XPStringImpl) EndWith(str, suffix string) bool {
 	return strings.HasSuffix(str, suffix)
 }
 
+// Contain 是否包含子字符串
 func (instance *XPStringImpl) Contain(str, sub string) bool {
 	return strings.Contains(str, sub)
 }
 
+// ContainHan 是否包含汉字
 func (instance *XPStringImpl) ContainHan(str string) bool {
 	result := false
 	for _, r := range str {
@@ -264,10 +309,12 @@ func (instance *XPStringImpl) ContainHan(str string) bool {
 	return result
 }
 
+// IsEmpty 字符串是否为空
 func (instance *XPStringImpl) IsEmpty(str string) bool {
 	return strings.Trim(str, " ") == ""
 }
 
+// IsNumeric 字符串是否为数字
 func (instance *XPStringImpl) IsNumeric(str string) bool {
 	pattern := "\\d+"
 	if r, err := getRegexp(pattern); err == nil {
@@ -277,6 +324,7 @@ func (instance *XPStringImpl) IsNumeric(str string) bool {
 }
 
 /**
+ * HideStr
  * 字符串掩码处理
  * @param str string 需要处理的字符串
  * @param code string 掩码符号如 （*）
@@ -307,7 +355,7 @@ func (instance *XPStringImpl) StripHtmlTags(html string) string {
 	return stripTags(html)
 }
 
-// 分词
+// Segment 分词
 // 将字符串分隔为一个单词列表，支持数字、驼峰风格等
 func (instance *XPStringImpl) Segment(str string) (entries []string) {
 	if !utf8.ValidString(str) {
@@ -353,6 +401,7 @@ func (instance *XPStringImpl) Segment(str string) (entries []string) {
 	return
 }
 
+// ToInt 转换为 int
 func (instance *XPStringImpl) ToInt(str string, def int) int {
 	out, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
@@ -361,6 +410,7 @@ func (instance *XPStringImpl) ToInt(str string, def int) int {
 	return int(out)
 }
 
+// ToInt32 转换为 int32
 func (instance *XPStringImpl) ToInt32(str string, def int32) int32 {
 	out, err := strconv.ParseInt(str, 10, 32)
 	if err != nil {
@@ -369,6 +419,7 @@ func (instance *XPStringImpl) ToInt32(str string, def int32) int32 {
 	return int32(out)
 }
 
+// ToInt64 转换为 int64
 func (instance *XPStringImpl) ToInt64(str string, def int64) int64 {
 	out, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
@@ -378,6 +429,7 @@ func (instance *XPStringImpl) ToInt64(str string, def int64) int64 {
 	return out
 }
 
+// ToFloat32 转换为 float32
 func (instance *XPStringImpl) ToFloat32(str string, def float32) float32 {
 	out, err := strconv.ParseFloat(str, 32)
 	if err != nil {
@@ -387,6 +439,7 @@ func (instance *XPStringImpl) ToFloat32(str string, def float32) float32 {
 	return float32(out)
 }
 
+// ToFloat64 转换为 float64
 func (instance *XPStringImpl) ToFloat64(str string, def float64) float64 {
 	out, err := strconv.ParseFloat(str, 64)
 	if err != nil {
@@ -396,6 +449,7 @@ func (instance *XPStringImpl) ToFloat64(str string, def float64) float64 {
 	return out
 }
 
+// ToBool 转换为 bool
 func (instance *XPStringImpl) ToBool(str string, def bool) bool {
 	switch str {
 	case "1", "t", "T", "true", "TRUE", "True", "YES", "Yes":
@@ -409,7 +463,7 @@ func (instance *XPStringImpl) ToBool(str string, def bool) bool {
 
 //===============
 
-func htmlNospaceEscaper(args ...interface{}) string {
+func htmlNoSpaceEscaper(args ...interface{}) string {
 	s, t := stringify(args...)
 	if t == contentTypeHTML {
 		return htmlReplacer(stripTags(s), htmlNospaceNormReplacementTable, false)
@@ -1040,7 +1094,7 @@ var funcMap = template.FuncMap{
 	"html_template_jsregexpescaper": jsRegexpEscaper,
 	"html_template_jsstrescaper":    jsStrEscaper,
 	"html_template_jsvalescaper":    jsValEscaper,
-	"html_template_nospaceescaper":  htmlNospaceEscaper,
+	"html_template_nospaceescaper":  htmlNoSpaceEscaper,
 	"html_template_rcdataescaper":   rcdataEscaper,
 	"html_template_urlescaper":      urlEscaper,
 	"html_template_urlfilter":       urlFilter,

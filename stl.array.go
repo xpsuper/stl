@@ -5,9 +5,11 @@ import (
 	"fmt"
 )
 
+// XPArrayImpl 数组工具对象
 type XPArrayImpl struct {
 }
 
+// Merge 数组合并
 func (instance *XPArrayImpl) Merge(arr ...[]interface{}) (array []interface{}) {
 	switch len(arr) {
 	case 0:
