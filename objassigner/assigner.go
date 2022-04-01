@@ -45,6 +45,7 @@ var (
 type Option struct {
 	IgnoreEmpty bool
 	DeepCopy    bool
+	CutSlice    bool
 	Converters  []TypeConverter
 }
 
@@ -71,7 +72,7 @@ type tagNameMapping struct {
 }
 
 func Assign(toValue interface{}, fromValue interface{}) (err error) {
-	return assign(toValue, fromValue, Option{true, true, nil})
+	return assign(toValue, fromValue, Option{true, true, true, nil})
 }
 
 func AssignWithOption(toValue interface{}, fromValue interface{}, opt Option) (err error) {
@@ -178,6 +179,12 @@ func assign(toValue interface{}, fromValue interface{}, opt Option) (err error) 
 		if to.IsNil() {
 			slice := reflect.MakeSlice(reflect.SliceOf(to.Type().Elem()), from.Len(), from.Cap())
 			to.Set(slice)
+		}
+
+		if opt.CutSlice {
+			if from.Len() < to.Len() {
+				to.SetLen(from.Len())
+			}
 		}
 
 		for i := 0; i < from.Len(); i++ {
@@ -309,7 +316,7 @@ func assign(toValue interface{}, fromValue interface{}, opt Option) (err error) 
 					}
 				}
 			}
-			
+
 			for _, field := range deepFields(toType) {
 				name := field.Name
 				srcFieldName, destFieldName := getFieldName(name, flgs)
