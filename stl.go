@@ -106,6 +106,22 @@ func ToMap(data interface{}) map[string]interface{} {
 	return m
 }
 
+// ToArray 转为 slice
+func ToArray(data interface{}) []interface{} {
+	jsonByte, err := json.Marshal(data)
+	if err != nil {
+		fmt.Printf("Marshal with error: %+v\n", err)
+		return nil
+	}
+	m := make([]interface{}, 0)
+	err = json.Unmarshal(jsonByte, &m)
+	if err != nil {
+		fmt.Printf("Unmarshal with error: %+v\n", err)
+		return nil
+	}
+	return m
+}
+
 // AdapterDecode 对象转换适配器
 func AdapterDecode(input, output interface{}) error {
 	return adapter.WeakDecode(input, output)
