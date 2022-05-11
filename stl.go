@@ -18,6 +18,7 @@ import (
 	"github.com/xpsuper/stl/taskbus"
 	"image"
 	"io"
+	"reflect"
 )
 
 var (
@@ -92,7 +93,17 @@ func ToJsonIndent(data interface{}) string {
 
 // ToMap 转为 map
 func ToMap(data interface{}) map[string]interface{} {
-	jsonByte, err := json.Marshal(data)
+	dataRef := reflect.ValueOf(data)
+	for dataRef.Kind() == reflect.Ptr {
+		dataRef = dataRef.Elem()
+	}
+	var jsonByte []byte
+	var err error
+	if dataRef.Kind() == reflect.String {
+		jsonByte = []byte(dataRef.String())
+	} else {
+		jsonByte, err = json.Marshal(data)
+	}
 	if err != nil {
 		fmt.Printf("Marshal with error: %+v\n", err)
 		return nil
@@ -108,7 +119,17 @@ func ToMap(data interface{}) map[string]interface{} {
 
 // ToArray 转为 slice
 func ToArray(data interface{}) []interface{} {
-	jsonByte, err := json.Marshal(data)
+	dataRef := reflect.ValueOf(data)
+	for dataRef.Kind() == reflect.Ptr {
+		dataRef = dataRef.Elem()
+	}
+	var jsonByte []byte
+	var err error
+	if dataRef.Kind() == reflect.String {
+		jsonByte = []byte(dataRef.String())
+	} else {
+		jsonByte, err = json.Marshal(data)
+	}
 	if err != nil {
 		fmt.Printf("Marshal with error: %+v\n", err)
 		return nil
