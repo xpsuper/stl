@@ -60,12 +60,22 @@ func IsEmpty(data interface{}) bool {
 	if data == nil {
 		return true
 	}
-	switch data.(type) {
-	case string:
-		return S.IsEmpty(data.(string))
-	case []interface{}:
-		return len(data.([]interface{})) == 0
+	dataRef := reflect.ValueOf(data)
+	for dataRef.Kind() == reflect.Ptr {
+		dataRef = dataRef.Elem()
 	}
+	switch dataRef.Kind() {
+	case reflect.Array, reflect.Map, reflect.Slice:
+		return dataRef.Len() == 0
+	case reflect.String:
+		return S.IsEmpty(data.(string))
+	}
+	//switch data.(type) {
+	//case string:
+	//	return S.IsEmpty(data.(string))
+	//case []interface{}:
+	//	return len(data.([]interface{})) == 0
+	//}
 	return false
 }
 
