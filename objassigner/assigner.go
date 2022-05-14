@@ -602,7 +602,7 @@ func getFlags(dest, src reflect.Value, toType, fromType reflect.Type) (flags, er
 
 	// Get a list dest of tags
 	for _, field := range toTypeFields {
-		tags := field.Tag.Get("copier")
+		tags := field.Tag.Get("assign")
 		if tags != "" {
 			var name string
 			var err error
@@ -617,7 +617,7 @@ func getFlags(dest, src reflect.Value, toType, fromType reflect.Type) (flags, er
 
 	// Get a list source of tags
 	for _, field := range fromTypeFields {
-		tags := field.Tag.Get("copier")
+		tags := field.Tag.Get("assign")
 		if tags != "" {
 			var name string
 			var err error
