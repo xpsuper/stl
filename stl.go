@@ -308,6 +308,18 @@ func Eval(expression string, parameter interface{}, opts ...eval.Language) (inte
 	return eval.Evaluate(expression, parameter, opts...)
 }
 
+func EvalFull(extensions ...eval.Language) eval.Language {
+	return eval.Full(extensions...)
+}
+
+func EvalConstant(name string, value interface{}) eval.Language {
+	return eval.Constant(name, value)
+}
+
+func EvalFunction(name string, value interface{}) eval.Language {
+	return eval.Function(name, value)
+}
+
 // HtmlParser 解析html
 func HtmlParser(r io.Reader) (*htmlparser.Node, error) {
 	return htmlparser.Parse(r)
