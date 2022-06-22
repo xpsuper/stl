@@ -1,5 +1,3 @@
-// +build !windows
-
 package srvmanager
 
 import (
@@ -131,9 +129,9 @@ func (file *pidFile) Get() (int, error) {
 }
 
 func (file *pidFile) Lock() error {
-	return syscall.Flock(int(file.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
+	return nil
 }
 
 func (file *pidFile) Unlock() error {
-	return syscall.Flock(int(file.Fd()), syscall.LOCK_UN)
+	return nil
 }
