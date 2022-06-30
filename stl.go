@@ -19,6 +19,7 @@ import (
 	"image"
 	"io"
 	"reflect"
+	"unsafe"
 )
 
 var (
@@ -151,6 +152,21 @@ func ToArray(data interface{}) []interface{} {
 		return nil
 	}
 	return m
+}
+
+// StringToBytes string 转为 []byte
+func StringToBytes(s string) []byte {
+	return *(*[]byte)(unsafe.Pointer(
+		&struct {
+			string
+			Cap int
+		}{s, len(s)},
+	))
+}
+
+// BytesToString []byte 转为 string
+func BytesToString(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }
 
 // AdapterDecode 对象转换适配器
