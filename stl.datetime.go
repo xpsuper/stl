@@ -143,3 +143,42 @@ func (instance *XPDateTimeImpl) Timestamp() int64 {
 func (instance *XPDateTimeImpl) TimestampMillisecond() int64 {
 	return time.Now().UnixNano() / 1000000
 }
+
+// IsSameDay 是否是同一天
+func (instance *XPDateTimeImpl) IsSameDay(t1, t2 time.Time) bool {
+	y1, m1, d1 := t1.Date()
+	y2, m2, d2 := t2.Date()
+
+	return y1 == y2 && m1 == m2 && d1 == d2
+}
+
+// IsSameWeek 判断两个时间是否在同一周
+func (instance *XPDateTimeImpl) IsSameWeek(t1, t2 time.Time) bool {
+	y1, w1 := t1.ISOWeek()
+	y2, w2 := t2.ISOWeek()
+	return y1 == y2 && w1 == w2
+}
+
+// IsSameMonth 是否同一个月
+func (instance *XPDateTimeImpl) IsSameMonth(t1, t2 time.Time) bool {
+	y1, m1, _ := t1.Date()
+	y2, m2, _ := t2.Date()
+	return y1 == y2 && m1 == m2
+}
+
+// IsSameYear 是否同一年
+func (instance *XPDateTimeImpl) IsSameYear(t1, t2 time.Time) bool {
+	y1, _, _ := t1.Date()
+	y2, _, _ := t2.Date()
+	return y1 == y2
+}
+
+// IsToday 是否是今天
+func (instance *XPDateTimeImpl) IsToday(t time.Time) bool {
+	return instance.IsSameDay(t, time.Now())
+}
+
+// IsLeapYear 是否为闰年
+func (instance *XPDateTimeImpl) IsLeapYear(year int) bool {
+	return year%4 == 0 && year%100 != 0 || year%400 == 0
+}
