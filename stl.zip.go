@@ -3,6 +3,8 @@ package stl
 import (
 	"archive/zip"
 	"bytes"
+	"compress/gzip"
+	"encoding/base64"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,7 +12,44 @@ import (
 )
 
 type XPZipImpl struct {
+}
 
+func (instance *XPZipImpl) GZipEncode(input string) (string, error) {
+	// 创建一个新的 byte 输出流
+	var buf bytes.Buffer
+	// 创建一个新的 gzip 输出流
+	gzipWriter := gzip.NewWriter(&buf)
+	// 将 input byte 数组写入到此输出流中
+	_, err := gzipWriter.Write([]byte(input))
+	if err != nil {
+		_ = gzipWriter.Close()
+		return "", err
+	}
+	if err = gzipWriter.Close(); err != nil {
+		return "", err
+	}
+	encoded := base64.StdEncoding.EncodeToString(buf.Bytes())
+	return encoded, nil
+}
+
+func (instance *XPZipImpl) GZipDecode(input string) (string, error) {
+	// 创建一个新的 gzip.Reader
+	decodeBytes, _ := base64.StdEncoding.DecodeString(input)
+	bytesReader := bytes.NewReader(decodeBytes)
+	gzipReader, err := gzip.NewReader(bytesReader)
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		// defer 中关闭 gzipReader
+		_ = gzipReader.Close()
+	}()
+	buf := new(bytes.Buffer)
+	// 从 Reader 中读取出数据
+	if _, err = buf.ReadFrom(gzipReader); err != nil {
+		return "", err
+	}
+	return string(buf.Bytes()), nil
 }
 
 func (instance *XPZipImpl) IsZip(source string) bool {
@@ -29,13 +68,13 @@ func (instance *XPZipImpl) IsZip(source string) bool {
 }
 
 func (instance *XPZipImpl) Zip(source, target string) error {
-	zipfile, err := os.Create(target)
+	zipFile, err := os.Create(target)
 	if err != nil {
 		return err
 	}
-	defer zipfile.Close()
+	defer zipFile.Close()
 
-	archive := zip.NewWriter(zipfile)
+	archive := zip.NewWriter(zipFile)
 	defer archive.Close()
 
 	info, err := os.Stat(source)
@@ -102,7 +141,7 @@ func (instance *XPZipImpl) UnZip(archive, target string) error {
 	for _, file := range reader.File {
 		path := filepath.Join(target, file.Name)
 		if file.FileInfo().IsDir() {
-			os.MkdirAll(path, file.Mode())
+			_ = os.MkdirAll(path, file.Mode())
 			continue
 		}
 
@@ -110,7 +149,9 @@ func (instance *XPZipImpl) UnZip(archive, target string) error {
 		if err != nil {
 			return err
 		}
-		defer fileReader.Close()
+		defer func(fileReader io.ReadCloser) {
+			_ = fileReader.Close()
+		}(fileReader)
 
 		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
