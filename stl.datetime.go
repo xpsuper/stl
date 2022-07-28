@@ -182,3 +182,15 @@ func (instance *XPDateTimeImpl) IsToday(t time.Time) bool {
 func (instance *XPDateTimeImpl) IsLeapYear(year int) bool {
 	return year%4 == 0 && year%100 != 0 || year%400 == 0
 }
+
+// ThisMonday 获取本周一
+func  (instance *XPDateTimeImpl) ThisMonday() time.Time {
+	now := time.Now()
+
+	offset := int(time.Monday - now.Weekday())
+	if offset > 0 {
+		offset = -6
+	}
+
+	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, offset)
+}

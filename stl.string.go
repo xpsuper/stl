@@ -323,6 +323,42 @@ func (instance *XPStringImpl) IsNumeric(str string) bool {
 	return false
 }
 
+// PadStart 字符串前补齐
+func (instance *XPStringImpl) PadStart(source string, size int, padStr string) string {
+	len1 := len(source)
+	len2 := len(padStr)
+
+	if len1 >= size {
+		return source
+	}
+
+	fill := ""
+	if len2 >= size-len1 {
+		fill = padStr[0 : size-len1]
+	} else {
+		fill = strings.Repeat(padStr, size-len1)
+	}
+	return fill[0:size-len1] + source
+}
+
+// PadEnd 字符串后补齐
+func (instance *XPStringImpl) PadEnd(source string, size int, padStr string) string {
+	len1 := len(source)
+	len2 := len(padStr)
+
+	if len1 >= size {
+		return source
+	}
+
+	fill := ""
+	if len2 >= size-len1 {
+		fill = padStr[0 : size-len1]
+	} else {
+		fill = strings.Repeat(padStr, size-len1)
+	}
+	return source + fill[0:size-len1]
+}
+
 /**
  * HideStr
  * 字符串掩码处理
