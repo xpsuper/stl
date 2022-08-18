@@ -12,6 +12,7 @@ import (
 	"github.com/xpsuper/stl/helper"
 	"github.com/xpsuper/stl/htmlparser"
 	"github.com/xpsuper/stl/jwt"
+	"github.com/xpsuper/stl/linq"
 	"github.com/xpsuper/stl/memorycache"
 	"github.com/xpsuper/stl/objassigner"
 	"github.com/xpsuper/stl/srvmanager"
@@ -202,6 +203,11 @@ func FilePathCurrent() (filepath *XPFilePathImpl, err error) {
 // IdGenerator 唯一ID生成器
 func IdGenerator(workerId int64) (idGenerator *XPIdGeneratorImpl, err error) {
 	return NewIdGenerator(workerId)
+}
+
+// LINQ 集成查询
+func LINQ(source interface{}) linq.LinQuery {
+	return linq.From(source)
 }
 
 // Helper 帮助类
