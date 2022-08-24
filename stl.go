@@ -91,6 +91,10 @@ func ToJson(data interface{}) string {
 	return string(jsonByte)
 }
 
+func FromJson(jsonStr string, data interface{}) error {
+	return json.Unmarshal([]byte(jsonStr), data)
+}
+
 // ToJsonIndent 转为 Json 格式化字符串
 func ToJsonIndent(data interface{}) string {
 	b, err := json.Marshal(data)
