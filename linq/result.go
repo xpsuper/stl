@@ -384,7 +384,7 @@ func (q LinQuery) SequenceEqual(q2 LinQuery) bool {
 
 	for item, ok := next(); ok; item, ok = next() {
 		item2, ok2 := next2()
-		if !ok2 || item != item2 {
+		if !ok2 || !equal(item, item2) {
 			return false
 		}
 	}
