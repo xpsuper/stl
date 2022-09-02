@@ -393,6 +393,21 @@ func (q LinQuery) SequenceEqual(q2 LinQuery) bool {
 	return !ok2
 }
 
+func (q LinQuery) SequenceEqualBy(q2 LinQuery, comparator func(v1, v2 interface{}) bool) bool {
+	next := q.Iterate()
+	next2 := q2.Iterate()
+
+	for item, ok := next(); ok; item, ok = next() {
+		item2, ok2 := next2()
+		if !ok2 || !comparator(item, item2) {
+			return false
+		}
+	}
+
+	_, ok2 := next2()
+	return !ok2
+}
+
 // SumInt 计算和
 func (q LinQuery) SumInt() (r int64) {
 	next := q.Iterate()
