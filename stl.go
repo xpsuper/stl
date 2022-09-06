@@ -38,6 +38,7 @@ var (
 	Scheduler *XPSchedulerImpl
 	Zip       *XPZipImpl
 	Jwt       *jwt.XPJwtImpl
+	IdCard    *XPIdCardImpl
 )
 
 func init() {
@@ -55,6 +56,7 @@ func init() {
 	Scheduler = NewScheduler()
 	Zip = &XPZipImpl{}
 	Jwt = &jwt.XPJwtImpl{}
+	IdCard = &XPIdCardImpl{}
 }
 
 // IsEmpty 判断是否为空
