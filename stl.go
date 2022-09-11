@@ -176,6 +176,45 @@ func BytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
+// MapValue 获取 map 的值
+func MapValue[K comparable, V any](m map[K]interface{}, key K, def V) V {
+	if m == nil {
+		return def
+	}
+	if v, has := m[key]; has {
+		if value, ok := v.(V); ok {
+			return value
+		}
+	}
+	return def
+}
+
+// MapKeys 获取 map 的所有 key
+func MapKeys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, len(m))
+
+	var i int
+	for k := range m {
+		keys[i] = k
+		i++
+	}
+
+	return keys
+}
+
+// MapValues 获取 map 的所有 value
+func MapValues[K comparable, V any](m map[K]V) []V {
+	values := make([]V, len(m))
+
+	var i int
+	for _, v := range m {
+		values[i] = v
+		i++
+	}
+
+	return values
+}
+
 // AdapterDecode 对象转换适配器
 func AdapterDecode(input, output interface{}) error {
 	return adapter.WeakDecode(input, output)
